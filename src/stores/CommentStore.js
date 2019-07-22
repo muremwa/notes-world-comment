@@ -15,53 +15,7 @@ class CommentStore extends EventEmitter {
             'title':'Worst behavior by Drake',
             'comments':5
         }
-        this.comments = [
-            {
-                "username": "muremwa",
-                "full_name": "Daniel Mburu",
-                "profile": "http://127.0.0.1:8000/media/profile_images/IMG_20180826_163833.jpg",
-                "time": "240 days ago",
-                "text": "@lois what do you mean?",
-                "edited": true,
-                "replies": 2
-            },
-            {
-                "username": "lois",
-                "full_name": "Lois Griffin",
-                "profile": "http://127.0.0.1:8000/media/profile_images/lois.jpg",
-                "time": "240 days ago",
-                "text": "mmm",
-                "edited": false,
-                "replies": 1
-            },
-            {
-                "username": "bow",
-                "full_name": "Rainbow Johnson",
-                "profile": "http://127.0.0.1:8000/media/profile_images/tracee.jpg",
-                "time": "240 days ago",
-                "text": "do you slide?",
-                "edited": false,
-                "replies": 1
-            },
-            {
-                "username": "chris",
-                "full_name": "Chris Griffin",
-                "profile": "http://127.0.0.1:8000/media/profile_images/chris.jpg",
-                "time": "247 days ago",
-                "text": "m,m,",
-                "edited": false,
-                "replies": 1
-            },
-            {
-                "username": "muremwa",
-                "full_name": "Daniel Mburu",
-                "profile": "http://127.0.0.1:8000/media/profile_images/IMG_20180826_163833.jpg",
-                "time": "248 days ago",
-                "text": "@chris work here I Will",
-                "edited": true,
-                "replies": 3
-            }
-        ];
+        this.comments = [];
     }
 
     getComments () {
@@ -75,8 +29,20 @@ class CommentStore extends EventEmitter {
     getUser () {
         return this.user;
     }
+
+    handleActions (action) {
+        switch (action.type) {
+            case 'COMMENTS':
+                this.comments = action.comments;
+                this.emit('change');
+                break;
+        
+            default:
+                break;
+        }
+    }
 }
 
 const commentStore = new CommentStore();
-
+dispatcher.register(commentStore.handleActions.bind(commentStore))
 export default commentStore;

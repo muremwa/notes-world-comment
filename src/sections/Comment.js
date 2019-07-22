@@ -44,7 +44,7 @@ class Comment extends Component {
     render () {
         return (
             <div id="comment14" class="row text-primary comment">
-                <UserImage user={this.props.user} profile={this.props.imageUrl}/>
+                <UserImage user={this.props.user} profile={'http://127.0.0.1:8000'+this.props.imageUrl}/>
                 <CommentBody user={this.props.user} name={this.props.name} comment={this.props.comment} time={this.props.time} replies={this.props.replies}/>
                 <BottomAction />
                 <hr />
