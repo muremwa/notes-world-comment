@@ -11,10 +11,7 @@ class CommentStore extends EventEmitter {
             'full_name':'Test Name',
             'profile_url':'http://127.0.0.1:8000/media/profile_images/tracee.jpg'
         };
-        this.post = {
-            'title':'Worst behavior by Drake',
-            'comments':5
-        }
+        this.post = {}
         this.comments = [];
     }
 
@@ -33,7 +30,21 @@ class CommentStore extends EventEmitter {
     handleActions (action) {
         switch (action.type) {
             case 'COMMENTS':
-                this.comments = action.comments;
+                this.comments = action.payload.comments.map((comment) => (
+                    {
+                        user: comment.username,
+                        name: comment.full_name,
+                        imageUrl: comment.profile,
+                        comment: comment.text,
+                        time: comment.time,
+                        replies: comment.replies,
+                        edited: comment.edited
+                    }
+                ));
+                this.post = {
+                    'title': action.payload.note,
+                    'comments': action.payload.comments.length
+                }
                 this.emit('change');
                 break;
         
