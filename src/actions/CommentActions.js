@@ -4,7 +4,7 @@ import $ from 'jquery';
  export function fetchComments () {
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:8000/api/comments/1/",
+        url: window.api + "/api/comments/1/",
         crossDomain: true,
         success: function (response) {
             dispatcher.dispatch({

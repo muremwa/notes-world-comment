@@ -1,4 +1,5 @@
 import React,{ Component } from "react";
+import parseComment from '../logic/CommentParse';
 
 function UserImage(props) {
     return (
@@ -11,7 +12,10 @@ function UserImage(props) {
 
 
 function ActionButton (props) {
-    return <button className="btn btn-link" href={props.actionUrl}>{props.action}</button>
+    const buttonType = function () {
+        return props.action === 'delete comment'? 'danger': 'dark';
+    }();
+    return <button className={"btn btn-link text-"+buttonType} href={props.actionUrl}>{props.action}</button>
 }
 
 
@@ -20,22 +24,42 @@ class BottomAction extends Component {
         return (
             <div className="action-buttons">
                 <ActionButton action={'reply'} actionUrl='/notes/'/>
-                <ActionButton action={'delete'} actionUrl='/notes/'/>
-                <ActionButton action={'flag'} actionUrl='/notes/'/>
+                <ActionButton action={'edit'} actionUrl='/notes/'/>
+                <ActionButton action={'delete comment'} actionUrl='/notes/'/>
             </div>
         )
     }
 }
 
+
+function Edited (props) {
+    let statement_edited = <span className="text-info">edited</span>;
+    let statement = <span className="text-info"></span>;
+
+    if (props.edited) {
+        return statement_edited;
+    } else {
+        return statement;
+    }
+}
+
 class CommentBody extends Component {
     render () {
+        const {name, user, time, edited, replies, comment} = this.props;
+        const cleanComment = parseComment(comment);
+
         return (
             <div className="col-sm-11">
                 <span className="comment-info">
-                    <strong>{this.props.name}</strong> <small className="text-danger">@{this.props.user}</small> posted <strong className="dated">{this.props.time}</strong> <span className="text-info">edited</span>
+                    <strong>{name} </strong> 
+                    <small className="text-danger">@{user} </small> 
+                    posted <strong className="dated">{time} </strong>
+                    <Edited edited={edited} />
                 </span>
-                <span className="text-info">{this.props.replies} replies</span>
-                <div className="comment-text"><p>{this.props.comment}</p></div>
+                <span className="text-info"> {replies} replies</span>
+                <div className="comment-text">
+                    <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
+                </div>
                 <BottomAction />
             </div>
         );
@@ -48,7 +72,7 @@ class Comment extends Component {
         return (
             <div className="row text-primary comment">
                 <UserImage user={this.props.user} profile={'http://127.0.0.1:8000'+this.props.imageUrl}/>
-                <CommentBody user={this.props.user} name={this.props.name} comment={this.props.comment} time={this.props.time} replies={this.props.replies}/>
+                <CommentBody {...this.props}/>
                 <hr />
             </div>
         )
