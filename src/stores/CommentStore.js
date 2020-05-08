@@ -35,6 +35,7 @@ class CommentStore extends EventEmitter {
                         user: comment.username,
                         name: comment.full_name,
                         imageUrl: comment.profile,
+                        commentId: comment.comment_id,
                         comment: comment.text,
                         time: comment.time,
                         replies: comment.replies,
