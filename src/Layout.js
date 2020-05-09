@@ -14,8 +14,9 @@ class Layout extends Component {
 		super();
     	this.getComments = this.getComments.bind(this);
     	this.state = {
-        	'post': CommentStore.getPost(),
-        	'comments': CommentStore.getComments(),
+			post: CommentStore.getPost(),
+			user: CommentStore.getUser(),
+			comments: CommentStore.getComments(),
     	}
 	}
 
@@ -32,13 +33,15 @@ class Layout extends Component {
 
 	getComments () {
 		this.setState({
-			'comments': CommentStore.getComments(),
-			'post': CommentStore.getPost(),
+			comments: CommentStore.getComments(),
+			post: CommentStore.getPost(),
+			user: CommentStore.getUser(),
 		})
 	}
 
+
 	render() {
-		let comments = this.state.comments.map((comment) => <Comment key={comment.commentId} {...comment} />)
+		let comments = this.state.comments.map((comment) => <Comment key={comment.commentId} {...comment}/>)
 
 		if (comments.length === 0) {
 			comments[0] = <LoadingComments key={0} />

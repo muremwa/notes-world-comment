@@ -15,17 +15,47 @@ function ActionButton (props) {
     const buttonType = function () {
         return props.action === 'delete comment'? 'danger': 'dark';
     }();
-    return <button className={"btn btn-link text-"+buttonType} href={props.actionUrl}>{props.action}</button>
+    return <button className={"btn btn-link text-"+buttonType} data-url={props.actionUrl}>{props.action}</button>
 }
 
 
 class BottomAction extends Component {
+    constructor () {
+        super();
+        this.state = {
+            actions: [
+                {
+                    action: 'reply',
+                    dataUrl: '/reply/',
+                    edit: true,
+                },
+                {
+                    action: 'edit comment',
+                    dataUrl: '/edit/',
+                    edit: true,
+                },
+                {
+                    action: 'delete comment',
+                    dataUrl: '/delete/',
+                    edit: true,
+                },
+                {
+                    action: 'flag',
+                    dataUrl: '/flag/',
+                    edit: false,
+                },
+            ]
+        }
+    };
+
     render () {
+        let actionButtons = this.state.actions.filter(
+            (action) => action.edit === this.props.editable || action.action === 'reply'
+        ).map((action) => <ActionButton {...action}/>);
+
         return (
             <div className="action-buttons">
-                <ActionButton action={'reply'} actionUrl='/notes/'/>
-                <ActionButton action={'edit'} actionUrl='/notes/'/>
-                <ActionButton action={'delete comment'} actionUrl='/notes/'/>
+                {actionButtons}
             </div>
         )
     }
@@ -60,7 +90,7 @@ class CommentBody extends Component {
                 <div className="comment-text">
                     <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
                 </div>
-                <BottomAction />
+                <BottomAction editable={this.props.editable} />
             </div>
         );
     }
