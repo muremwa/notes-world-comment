@@ -1,4 +1,5 @@
 import React,{ Component } from "react";
+import { deleteComment } from '../actions/CommentActions';
 import parseComment from '../logic/CommentParse';
 
 function UserImage(props) {
@@ -15,7 +16,7 @@ function ActionButton (props) {
     const buttonType = function () {
         return props.action === 'delete comment'? 'danger': 'dark';
     }();
-    return <button className={"btn btn-link text-"+buttonType} data-url={props.actionUrl}>{props.action}</button>
+    return <button onClick={props.clickHandler} className={"btn btn-link text-"+buttonType} data-id={props.id} data-url={props.actionUrl}>{props.action}</button>
 }
 
 
@@ -26,32 +27,59 @@ class BottomAction extends Component {
             actions: [
                 {
                     action: 'reply',
-                    dataUrl: '/reply/',
+                    actionUrl: '/reply/',
                     edit: true,
+                    clickHandler: function (e) {
+                        // handle the reply button click
+                        const replyUrl = e.target.attributes['data-url'].value;
+                        window.location.href = replyUrl;
+                    }
                 },
                 {
                     action: 'edit comment',
-                    dataUrl: '/edit/',
+                    actionUrl: '/edit/',
                     edit: true,
+                    clickHandler: function (e) {
+                        console.log(e.target);
+                    }
                 },
                 {
                     action: 'delete comment',
-                    dataUrl: '/delete/',
+                    actionUrl: '/delete/',
                     edit: true,
+                    clickHandler: function (e) {
+                        const url = e.target.attributes['data-url'].value;
+                        const commentId = e.target.attributes['data-id'].value;
+                        e.target.parentElement.parentElement.parentElement.innerHTML = "<h2 class='text-center' style='margin-left: 20%'>comment deleted!</h2>"
+                        deleteComment(url, commentId);
+                    }
                 },
                 {
                     action: 'flag',
-                    dataUrl: '/flag/',
+                    actionUrl: '/flag/',
                     edit: false,
+                    clickHandler: function (e) {
+                        console.log(e.target);
+                    }
                 },
             ]
         }
     };
 
     render () {
-        let actionButtons = this.state.actions.filter(
+        const {replyUrl, deleteUrl, id} = this.props;
+
+        const actionButtons = this.state.actions.filter(
             (action) => action.edit === this.props.editable || action.action === 'reply'
-        ).map((action) => <ActionButton {...action}/>);
+        ).map(function (action, i) {
+            // use appropriate urls mappings
+            if (action.action === 'reply') {
+                action.actionUrl = replyUrl;
+            } else if (action.action === 'delete comment') {
+                action.actionUrl = deleteUrl;
+            };
+            return <ActionButton key={i} id={id} {...action} />;
+        });
 
         return (
             <div className="action-buttons">
@@ -90,7 +118,7 @@ class CommentBody extends Component {
                 <div className="comment-text">
                     <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
                 </div>
-                <BottomAction editable={this.props.editable} />
+                <BottomAction id={this.props.commentId} editable={this.props.editable} replyUrl={this.props.replyUrl} deleteUrl={this.props.deleteUrl}/>
             </div>
         );
     }

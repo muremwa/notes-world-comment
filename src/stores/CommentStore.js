@@ -23,6 +23,13 @@ class CommentStore extends EventEmitter {
         return this.user;
     }
 
+    deleteComment(commentId) {
+        // delete a comment from this.comments
+        const index = this.comments.findIndex(comment => comment.commentId === commentId);
+        this.comments.splice(index, 1);
+        this.emit('change');
+    }
+
     handleActions (action) {
         switch (action.type) {
             case 'COMMENTS':
@@ -35,6 +42,8 @@ class CommentStore extends EventEmitter {
                         comment: comment.text,
                         time: comment.time,
                         replies: comment.replies,
+                        replyUrl: comment.reply_url,
+                        deleteUrl: comment.delete_url,
                         edited: comment.edited,
                         editable: comment.editable
                     }
@@ -51,6 +60,10 @@ class CommentStore extends EventEmitter {
                     profileUrl: action.payload.user.profile,
                 };
                 this.emit('change');
+                break;
+            
+            case 'DELETE_COMMENT':
+                this.deleteComment(action.comment);
                 break;
         
             default:

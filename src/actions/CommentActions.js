@@ -18,3 +18,20 @@ import $ from 'jquery';
     });
 }
 
+export function deleteComment(commentDeleteUrl) {
+    $.ajax({
+        type: "DELETE",
+        url: commentDeleteUrl,
+        crossDomain: true,
+        success: function (response, commentId) {
+            dispatcher.dispatch({
+                type: 'DELETED_COMMENT',
+                comment: commentId,
+            })
+        },
+        error: function (err) {
+            console.log('The following error occured =', err.statusText);
+        }
+    })
+}
+
