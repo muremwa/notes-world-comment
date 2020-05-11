@@ -25,11 +25,15 @@ class CommentEditForm extends Component {
         e.preventDefault();
         const url = this.props.actionUrl;
         const newComment = e.target.children['edit-control'].children['edit-comment'].value;
+        const commentDiv = e.target.parentElement.parentElement.children['comment-text'];
+        const preEdit = commentDiv.innerHTML;
+        commentDiv.innerHTML = '<h2>Editing comment...</h2>'
 
         if (newComment !== this.props.comment) {
             editComment(newComment, url, e.target);
         } else {
             e.target.style.display = 'none';
+            commentDiv.innerHTML = preEdit;
         }
     }
     
