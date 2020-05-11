@@ -40,6 +40,10 @@ class CommentEditForm extends Component {
     };
     
     render () {
+        if (!this.props.editable) {
+            return null;
+        }
+
         const formStyle = {
             display: 'none'
         }
@@ -125,7 +129,7 @@ class BottomAction extends Component {
         return (
             <div className="action-buttons">
                 {actionButtons}
-                <CommentEditForm comment={comment} actionUrl={actionUrl}/>
+                <CommentEditForm comment={comment} actionUrl={actionUrl} editable={this.props.editable}/>
             </div>
         )
     }
@@ -133,14 +137,10 @@ class BottomAction extends Component {
 
 
 function Edited (props) {
-    let statement_edited = <span className="text-info">edited</span>;
-    let statement = <span className="text-info"></span>;
-
-    if (props.edited) {
-        return statement_edited;
-    } else {
-        return statement;
+    if (!props.edited) {
+        return null;
     }
+    return <span className="text-info">edited</span>;
 }
 
 class CommentBody extends Component {
