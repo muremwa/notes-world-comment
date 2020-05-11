@@ -23,6 +23,14 @@ class CommentStore extends EventEmitter {
         return this.user;
     }
 
+    editComment (newComment) {
+        const comment = this.comments.find(comment => comment.commentId === newComment.comment_id);
+        comment.edited = true;
+        comment.comment = newComment.comment;
+        comment.uuid = newComment.new_key;
+        this.emit('change');
+    }
+
     deleteComment(commentId) {
         // delete a comment from this.comments
         const index = this.comments.findIndex(comment => comment.commentId === commentId);
@@ -35,6 +43,7 @@ class CommentStore extends EventEmitter {
             case 'COMMENTS':
                 this.comments = action.payload.comments.map((comment) => (
                     {
+                        uuid: comment.key,
                         user: comment.username,
                         name: comment.full_name,
                         imageUrl: comment.profile,
@@ -43,7 +52,7 @@ class CommentStore extends EventEmitter {
                         time: comment.time,
                         replies: comment.replies,
                         replyUrl: comment.reply_url,
-                        deleteUrl: comment.delete_url,
+                        actionUrl: comment.action_url,
                         edited: comment.edited,
                         editable: comment.editable
                     }
@@ -65,8 +74,13 @@ class CommentStore extends EventEmitter {
             case 'DELETE_COMMENT':
                 this.deleteComment(action.comment);
                 break;
+
+            case 'COMMENT_EDIT':
+                this.editComment(action.payload)
+                break;
         
             default:
+                console.log(`no such ${action.type}`)
                 break;
         }
     }

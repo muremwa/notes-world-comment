@@ -41,7 +41,7 @@ class Layout extends Component {
 
 
 	render() {
-		let comments = this.state.comments.map((comment) => <Comment key={comment.commentId} {...comment}/>)
+		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment}/>)
 
 		if (comments.length === 0) {
 			comments[0] = <LoadingComments key={0} />

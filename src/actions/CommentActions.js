@@ -35,3 +35,33 @@ export function deleteComment(commentDeleteUrl) {
     })
 }
 
+export function editComment (newComment, url, errorDiv) {
+    $.ajax({
+        type: 'PATCH',
+        url: url,
+        crossDomain: true,
+        data: {
+            'original_comment': newComment
+        },
+        success: function (response) {
+            if (response.success === true) {
+                dispatcher.dispatch ({
+                    type: 'COMMENT_EDIT',
+                    payload: response
+                });
+            } else {
+                errorDiv.innerHTML = `<div class="alert alert-warning"> \
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
+                                        <strong>Title!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
+                                    </div>`
+            }
+        },
+        error: function (err) {
+            console.log('the following error occured', err.statusText);
+            errorDiv.innerHTML = `<div class="alert alert-warning"> \
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
+                                        <strong>Title!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
+                                    </div>`
+        }
+    })
+}
