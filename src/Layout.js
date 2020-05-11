@@ -9,6 +9,30 @@ function LoadingComments () {
 	return <h2>Loading comments...</h2>
 }
 
+function NoCommentsAvalible (props) {
+	return (
+		<div id="no-comments">
+            <h3 className="alert-heading text-center">no comments yet to { props.noteTitle }</h3>
+        </div>
+	);
+}
+
+function CommentSite (props) {
+	if (!props.noComments) {
+		return <NoCommentsAvalible noteTitle={props.noteTitle} />
+	} else {
+		if (props.comments.length === 0) {
+			return <LoadingComments />
+		} else {
+			return (
+				<div>
+					{props.comments}
+				</div>
+			)
+		}
+	}
+}
+
 class Layout extends Component {
 	constructor () {
 		super();
@@ -17,6 +41,7 @@ class Layout extends Component {
 			post: CommentStore.getPost(),
 			user: CommentStore.getUser(),
 			comments: CommentStore.getComments(),
+			commentsExist: CommentStore.commentsExist
     	}
 	}
 
@@ -36,6 +61,7 @@ class Layout extends Component {
 			comments: CommentStore.getComments(),
 			post: CommentStore.getPost(),
 			user: CommentStore.getUser(),
+			commentsExist: CommentStore.commentsExist,
 		})
 	}
 
@@ -43,16 +69,12 @@ class Layout extends Component {
 	render() {
 		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment}/>)
 
-		if (comments.length === 0) {
-			comments[0] = <LoadingComments key={0} />
-		}
-
 		return (
 			<div id="comments">
 				<h3>comments <small className="text-warning">{this.state.post.title} has {this.state.post.comments} comments</small></h3>
 				<CommentForm />
 				<hr />
-				{ comments }
+				<CommentSite noComments={this.state.commentsExist} comments={comments} noteTitle={this.state.post.title} />
 			</div>
 		);
 	}

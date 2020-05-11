@@ -8,7 +8,7 @@ import $ from 'jquery';
      */
     $.ajax({
         type: "GET",
-        url: window.api + "/api/1/comments/",
+        url: window.api + "/api/10/comments/",
         crossDomain: true,
         success: function (response) {
             dispatcher.dispatch({
@@ -16,7 +16,7 @@ import $ from 'jquery';
                 payload: response
             })
         },
-        error: function (err) { 
+        error: function (err) {
             console.log('an error occured', err.statusText, err.status);
         }
     });
@@ -83,7 +83,7 @@ export function createComment (commentText) {
     */
    $.ajax({
        type: 'POST',
-       url: window.api + "/api/1/comments/",
+       url: window.api + "/api/10/comments/",
        crossDomain: true,
        data: {
            comment: commentText

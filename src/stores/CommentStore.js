@@ -9,6 +9,7 @@ class CommentStore extends EventEmitter {
         this.user = {};
         this.post = {}
         this.comments = [];
+        this.commentsExist = true;
     }
 
     getComments () {
@@ -39,6 +40,8 @@ class CommentStore extends EventEmitter {
             editable: newComment.editable
         };
         this.comments.unshift(cleanComment);
+        this.commentsExist = true;
+        this.post.comments++;
         this.emit('change');
     }
 
@@ -54,6 +57,7 @@ class CommentStore extends EventEmitter {
         // delete a comment from this.comments
         const index = this.comments.findIndex(comment => comment.commentId === commentId);
         this.comments.splice(index, 1);
+        this.post.comments--;
         this.emit('change');
     }
 
@@ -76,6 +80,11 @@ class CommentStore extends EventEmitter {
                         editable: comment.editable
                     }
                 ));
+
+                if (this.comments.length === 0) {
+                    this.commentsExist = false;
+                };
+
                 this.post = {
                     'title': action.payload.note,
                     'ownerId': action.payload.owner_id,
