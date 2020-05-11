@@ -23,6 +23,25 @@ class CommentStore extends EventEmitter {
         return this.user;
     }
 
+    createComment (newComment) {
+        const cleanComment = {
+            uuid: newComment.key,
+            user: newComment.username,
+            name: newComment.full_name,
+            imageUrl: newComment.profile,
+            commentId: newComment.comment_id,
+            comment: newComment.text,
+            time: newComment.time,
+            replies: newComment.replies,
+            replyUrl: newComment.reply_url,
+            actionUrl: newComment.action_url,
+            edited: newComment.edited,
+            editable: newComment.editable
+        };
+        this.comments.unshift(cleanComment);
+        this.emit('change');
+    }
+
     editComment (newComment) {
         const comment = this.comments.find(comment => comment.commentId === newComment.comment_id);
         comment.edited = true;
@@ -77,6 +96,10 @@ class CommentStore extends EventEmitter {
 
             case 'COMMENT_EDIT':
                 this.editComment(action.payload)
+                break;
+
+            case 'COMMENT_CREATED':
+                this.createComment(action.payload);
                 break;
         
             default:

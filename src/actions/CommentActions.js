@@ -1,10 +1,14 @@
 import dispatcher from '../dispatcher';
 import $ from 'jquery';
 
+
  export function fetchComments () {
+     /* 
+     fetch comments on load      
+     */
     $.ajax({
         type: "GET",
-        url: window.api + "/api/comments/1/",
+        url: window.api + "/api/1/comments/",
         crossDomain: true,
         success: function (response) {
             dispatcher.dispatch({
@@ -13,12 +17,15 @@ import $ from 'jquery';
             })
         },
         error: function (err) { 
-            console.log('an error occured', err);
+            console.log('an error occured', err.statusText, err.status);
         }
     });
 }
 
 export function deleteComment(commentDeleteUrl) {
+    /* 
+     delete a comment      
+     */
     $.ajax({
         type: "DELETE",
         url: commentDeleteUrl,
@@ -30,12 +37,15 @@ export function deleteComment(commentDeleteUrl) {
             })
         },
         error: function (err) {
-            console.log('The following error occured =', err.statusText);
+            console.log('The following error occured =', err.statusText, err.status);
         }
     })
 }
 
 export function editComment (newComment, url, errorDiv) {
+    /* 
+     edit a comment    
+     */
     $.ajax({
         type: 'PATCH',
         url: url,
@@ -52,7 +62,7 @@ export function editComment (newComment, url, errorDiv) {
             } else {
                 errorDiv.innerHTML = `<div class="alert alert-warning"> \
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
-                                        <strong>Title!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
+                                        <strong>Error!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
                                     </div>`
             }
         },
@@ -60,8 +70,36 @@ export function editComment (newComment, url, errorDiv) {
             console.log('the following error occured', err.statusText);
             errorDiv.innerHTML = `<div class="alert alert-warning"> \
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
-                                        <strong>Title!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
+                                        <strong>Error!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
                                     </div>`
         }
     })
+}
+
+
+export function createComment (commentText) {
+    /*
+    Create a new comment
+    */
+   $.ajax({
+       type: 'POST',
+       url: window.api + "/api/1/comments/",
+       crossDomain: true,
+       data: {
+           comment: commentText
+       },
+       success: function (response) { 
+            dispatcher.dispatch({
+                type: 'COMMENT_CREATED',
+                payload: response.comment,
+            })
+            document.getElementById('comment-alert-info').style.display = 'none';
+            document.getElementById('id_comment').value = '';
+       },
+       error: function (err) {
+           console.log('an error occured', err.statusText, err.status);
+           document.getElementById('comment-alert-info').style.display = 'none';
+           document.getElementById('comment-alert-error').style.display = '';
+       }
+   })
 }
