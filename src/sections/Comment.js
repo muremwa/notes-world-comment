@@ -51,7 +51,7 @@ class CommentEditForm extends Component {
         return (
             <form className="form-inline" style={formStyle} name='edit-comment-form' onSubmit={this.editComment.bind(this)}>
                 <div className="form-group col-sm-7" name='edit-control'>
-                    <textarea className="form-control" name='edit-comment' defaultValue={this.props.comment}></textarea>
+                    <textarea className="form-control" name='edit-comment' required defaultValue={this.props.comment}></textarea>
                 </div>
                 <div style={{width: '30%'}} className="form-group col-sm-2">
                     <input type="submit" className="btn form-control" value="edit" />
