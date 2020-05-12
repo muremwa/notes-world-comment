@@ -7,7 +7,7 @@ class CommentStore extends EventEmitter {
     constructor () {
         super();
         this.user = {};
-        this.post = {}
+        this.note = {};
         this.comments = [];
         this.commentsExist = true;
     }
@@ -16,32 +16,57 @@ class CommentStore extends EventEmitter {
         return this.comments;
     }
 
-    getPost () {
-        return this.post;
+    getNote () {
+        return this.note;
     }
 
     getUser () {
         return this.user;
     }
 
-    createComment (newComment) {
-        const cleanComment = {
-            uuid: newComment.key,
-            user: newComment.username,
-            name: newComment.full_name,
-            imageUrl: newComment.profile,
-            commentId: newComment.comment_id,
-            comment: newComment.text,
-            time: newComment.time,
-            replies: newComment.replies,
-            replyUrl: newComment.reply_url,
-            actionUrl: newComment.action_url,
-            edited: newComment.edited,
-            editable: newComment.editable
+    synthesisComment (rawComment) {
+        return {
+            uuid: rawComment.key,
+            user: rawComment.username,
+            name: rawComment.full_name,
+            imageUrl: rawComment.profile,
+            commentId: rawComment.comment_id,
+            comment: rawComment.text,
+            time: rawComment.time,
+            replies: rawComment.replies,
+            replyUrl: rawComment.reply_url,
+            actionUrl: rawComment.action_url,
+            edited: rawComment.edited,
+            editable: rawComment.editable
+        }
+    }
+
+    fetchComments (payload) {
+        this.comments = payload.comments.map((comment) => this.synthesisComment(comment));
+
+        if (this.comments.length === 0) {
+            this.commentsExist = false;
         };
+
+        this.note = {
+            'title': payload.note,
+            'ownerId': payload.owner_id,
+            'comments': payload.comments.length
+        };
+        this.user = {
+            id: payload.user.id,
+            userName: payload.user.username,
+            fullName: payload.user.full_name,
+            profileUrl: payload.user.profile,
+        };
+        this.emit('change');
+    }
+
+    createComment (newComment) {
+        const cleanComment = this.synthesisComment(newComment);
         this.comments.unshift(cleanComment);
         this.commentsExist = true;
-        this.post.comments++;
+        this.note.comments++;
         this.emit('change');
     }
 
@@ -57,46 +82,15 @@ class CommentStore extends EventEmitter {
         // delete a comment from this.comments
         const index = this.comments.findIndex(comment => comment.commentId === commentId);
         this.comments.splice(index, 1);
-        this.post.comments--;
+        this.note.comments--;
+        this.commentsExist = this.note.comments === 0? false: true;
         this.emit('change');
     }
 
     handleActions (action) {
         switch (action.type) {
             case 'COMMENTS':
-                this.comments = action.payload.comments.map((comment) => (
-                    {
-                        uuid: comment.key,
-                        user: comment.username,
-                        name: comment.full_name,
-                        imageUrl: comment.profile,
-                        commentId: comment.comment_id,
-                        comment: comment.text,
-                        time: comment.time,
-                        replies: comment.replies,
-                        replyUrl: comment.reply_url,
-                        actionUrl: comment.action_url,
-                        edited: comment.edited,
-                        editable: comment.editable
-                    }
-                ));
-
-                if (this.comments.length === 0) {
-                    this.commentsExist = false;
-                };
-
-                this.post = {
-                    'title': action.payload.note,
-                    'ownerId': action.payload.owner_id,
-                    'comments': action.payload.comments.length
-                };
-                this.user = {
-                    id: action.payload.user.id,
-                    userName: action.payload.user.username,
-                    fullName: action.payload.user.full_name,
-                    profileUrl: action.payload.user.profile,
-                };
-                this.emit('change');
+                this.fetchComments(action.payload);
                 break;
             
             case 'DELETE_COMMENT':

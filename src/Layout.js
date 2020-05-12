@@ -5,11 +5,18 @@ import * as CommentActions  from './actions/CommentActions';
 
 import CommentStore from './stores/CommentStore';
 
+
 function LoadingComments () {
+	/* 
+    Show comments are loading
+    */
 	return <h2>Loading comments...</h2>
 }
 
 function NoCommentsAvalible (props) {
+	/* 
+    No comments on this post
+    */
 	return (
 		<div id="no-comments">
             <h3 className="alert-heading text-center">no comments yet to { props.noteTitle }</h3>
@@ -18,6 +25,9 @@ function NoCommentsAvalible (props) {
 }
 
 function CommentSite (props) {
+	/* 
+    Decide whether to show comments are loading or that no comments are available
+    */
 	if (!props.noComments) {
 		return <NoCommentsAvalible noteTitle={props.noteTitle} />
 	} else {
@@ -38,7 +48,7 @@ class Layout extends Component {
 		super();
     	this.getComments = this.getComments.bind(this);
     	this.state = {
-			post: CommentStore.getPost(),
+			note: CommentStore.getNote(),
 			user: CommentStore.getUser(),
 			comments: CommentStore.getComments(),
 			commentsExist: CommentStore.commentsExist
@@ -59,7 +69,7 @@ class Layout extends Component {
 	getComments () {
 		this.setState({
 			comments: CommentStore.getComments(),
-			post: CommentStore.getPost(),
+			note: CommentStore.getNote(),
 			user: CommentStore.getUser(),
 			commentsExist: CommentStore.commentsExist,
 		})
@@ -67,14 +77,15 @@ class Layout extends Component {
 
 
 	render() {
-		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment}/>)
+		const ownsNote = this.state.note.ownerId === this.state.user.id? true: false;
+		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment} ownsNote={ownsNote}/>)
 
 		return (
 			<div id="comments">
-				<h3>comments <small className="text-warning">{this.state.post.title} has {this.state.post.comments} comments</small></h3>
+				<h3>comments <small className="text-warning">{this.state.note.title} has {this.state.note.comments} comments</small></h3>
 				<CommentForm />
 				<hr />
-				<CommentSite noComments={this.state.commentsExist} comments={comments} noteTitle={this.state.post.title} />
+				<CommentSite noComments={this.state.commentsExist} comments={comments} noteTitle={this.state.note.title} />
 			</div>
 		);
 	}

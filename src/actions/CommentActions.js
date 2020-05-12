@@ -33,7 +33,7 @@ export function deleteComment(commentDeleteUrl) {
         crossDomain: true,
         success: function (response, commentId) {
             dispatcher.dispatch({
-                type: 'DELETED_COMMENT',
+                type: 'DELETE_COMMENT',
                 comment: commentId,
             })
         },

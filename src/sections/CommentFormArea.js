@@ -2,15 +2,19 @@ import React, {Component} from 'react';
 import { createComment } from '../actions/CommentActions';
 
 class CommentForm extends Component {
+    /* 
+    Top comment creating form
+    */
     submitComment (e) {
         e.preventDefault();
         const comment = e.target.children['comment-textarea-group'].children['comment-textarea'].value;
         e.target.children['comment-info'].style.display = '';
         createComment(comment);
-    }
+    };
 
     render () {
-        const hiddenFeature = {display: 'none'}
+        const hiddenFeature = {display: 'none'};
+
         return (
             <form method="post" encType="multipart/form-data" onSubmit={this.submitComment.bind(this)}>
                 <div className="form-group" name='comment-textarea-group'>

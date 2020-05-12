@@ -3,6 +3,9 @@ import { deleteComment, editComment } from '../actions/CommentActions';
 import parseComment from '../logic/CommentParse';
 
 function UserImage(props) {
+    /* 
+    user's image on the comment section
+    */
     return (
         <div className="col-sm-1 user-img">                
             <img src={props.profile} alt={"profile picture for "+props.user} />
@@ -11,43 +14,46 @@ function UserImage(props) {
 }
 
 
-
 function ActionButton (props) {
-    const buttonType = function () {
-        return props.action === 'delete comment'? 'danger': 'dark';
-    }();
+    /* 
+    buttons under the comment
+    */
+    const buttonType = props.action === 'delete comment'? 'danger': 'dark';
     return <button onClick={props.clickHandler} className={"btn btn-link text-"+buttonType} data-id={props.id} data-url={props.actionUrl}>{props.action}</button>
 }
 
 
 class CommentEditForm extends Component {    
+    /* 
+    Form that appears under a comment section to enable one to edit the comment
+    */
     editComment (e) {
         e.preventDefault();
         const url = this.props.actionUrl;
-        window.xo = e.target
         const newComment = e.target.children[0].children[0].value;
         const commentDiv = e.target.parentElement.parentElement.children['comment-text'];
         const preEdit = commentDiv.innerHTML;
         commentDiv.innerHTML = '<h2>Editing comment...</h2>'
 
+        // only send a changed comment to the backend
         if (newComment !== this.props.comment) {
             editComment(newComment, url, e.target);
         } else {
             e.target.style.display = 'none';
             commentDiv.innerHTML = preEdit;
-        }
-    }
+        };
+    };
     
     handleAbort (e) {
         // when abort button is clicked close the edit comment form
-        e.target.parentElement.style.display = 'none';
-        
+        e.target.parentElement.style.display = 'none';  
     };
     
     render () {
+        // if a user cannot edit a comment, this form will not appear
         if (!this.props.editable) {
             return null;
-        }
+        };
 
         const formStyle = {
             display: 'none'
@@ -69,6 +75,9 @@ class CommentEditForm extends Component {
 
 
 class BottomAction extends Component {
+    /* 
+    The bottom section of a comment
+    */
     constructor () {
         super();
         this.state = {
@@ -131,6 +140,14 @@ class BottomAction extends Component {
             return <ActionButton key={i} id={id} {...action} />;
         });
 
+        // if the user owns this note they can delete the comment
+        if (this.props.ownsNote) {
+            if (actionButtons.length === 2) {
+                const deleteButton = <ActionButton key={2} id={id} {...this.state.actions[2]} actionUrl={actionUrl} />;
+                actionButtons.splice(1, 0, deleteButton);
+            }
+        }
+
         return (
             <div className="action-buttons">
                 {actionButtons}
@@ -165,7 +182,7 @@ class CommentBody extends Component {
                 <div className="comment-text" name='comment-text'>
                     <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
                 </div>
-                <BottomAction id={this.props.commentId} comment={comment} editable={this.props.editable} replyUrl={this.props.replyUrl} actionUrl={this.props.actionUrl}/>
+                <BottomAction id={this.props.commentId} ownsNote={this.props.ownsNote} comment={comment} editable={this.props.editable} replyUrl={this.props.replyUrl} actionUrl={this.props.actionUrl}/>
             </div>
         );
     }
@@ -173,6 +190,9 @@ class CommentBody extends Component {
 
 
 class Comment extends Component {
+    /* 
+    The whole comment container
+    */
     render () {
         return (
             <div className="row text-primary comment" id={"comment"+this.props.commentId}>
