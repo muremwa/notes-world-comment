@@ -24,7 +24,8 @@ class CommentEditForm extends Component {
     editComment (e) {
         e.preventDefault();
         const url = this.props.actionUrl;
-        const newComment = e.target.children['edit-control'].children['edit-comment'].value;
+        window.xo = e.target
+        const newComment = e.target.children[0].children[0].value;
         const commentDiv = e.target.parentElement.parentElement.children['comment-text'];
         const preEdit = commentDiv.innerHTML;
         commentDiv.innerHTML = '<h2>Editing comment...</h2>'
