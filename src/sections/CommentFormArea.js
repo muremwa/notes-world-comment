@@ -7,8 +7,9 @@ class CommentForm extends Component {
     */
     submitComment (e) {
         e.preventDefault();
-        const comment = e.target.children['comment-textarea-group'].children['comment-textarea'].value;
-        e.target.children['comment-info'].style.display = '';
+        window.f = e.target.children;
+        const comment = e.target.children[0].children[1].value;
+        e.target.children[2].style.display = '';
         createComment(comment);
     };
 

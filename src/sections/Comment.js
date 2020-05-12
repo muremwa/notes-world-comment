@@ -31,7 +31,7 @@ class CommentEditForm extends Component {
         e.preventDefault();
         const url = this.props.actionUrl;
         const newComment = e.target.children[0].children[0].value;
-        const commentDiv = e.target.parentElement.parentElement.children['comment-text'];
+        const commentDiv = e.target.parentElement.parentElement.children[1];
         const preEdit = commentDiv.innerHTML;
         commentDiv.innerHTML = '<h2>Editing comment...</h2>'
 
@@ -98,7 +98,8 @@ class BottomAction extends Component {
                     edit: true,
                     clickHandler: function (e) {
                         // handle editting a comment
-                        e.target.parentElement.children['edit-comment-form'].style.display = '';
+                        const editForm = e.target.parentElement.children[e.target.parentElement.children.length - 1];
+                        editForm.style.display = '';
                     }
                 },
                 {
@@ -177,8 +178,8 @@ class CommentBody extends Component {
                     <small className="text-danger">@{user} </small> 
                     posted <strong className="dated">{time} </strong>
                     <Edited edited={edited} />
+                    <span className="text-info"> {replies} replies</span>
                 </span>
-                <span className="text-info"> {replies} replies</span>
                 <div className="comment-text" name='comment-text'>
                     <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
                 </div>
