@@ -1,5 +1,6 @@
 import dispatcher from '../dispatcher';
 import $ from 'jquery';
+import { noteCommentsApi } from '../index';
 
 
  export function fetchComments () {
@@ -8,7 +9,7 @@ import $ from 'jquery';
      */
     $.ajax({
         type: "GET",
-        url: window.api + "/api/10/comments/",
+        url: noteCommentsApi,
         crossDomain: true,
         success: function (response) {
             dispatcher.dispatch({
@@ -83,7 +84,7 @@ export function createComment (commentText) {
     */
    $.ajax({
        type: 'POST',
-       url: window.api + "/api/10/comments/",
+       url: noteCommentsApi,
        crossDomain: true,
        data: {
            comment: commentText
