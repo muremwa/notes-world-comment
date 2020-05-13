@@ -98,7 +98,7 @@ class BottomAction extends Component {
                     edit: true,
                     clickHandler: function (e) {
                         // handle editting a comment
-                        const editForm = e.target.parentElement.children[e.target.parentElement.children.length - 1];
+                        const editForm = e.target.parentElement.children[e.target.parentElement.children.length - 2];
                         editForm.style.display = '';
                     }
                 },
@@ -153,6 +153,7 @@ class BottomAction extends Component {
             <div className="action-buttons">
                 {actionButtons}
                 <CommentEditForm comment={comment} actionUrl={actionUrl} editable={this.props.editable}/>
+                <hr />
             </div>
         )
     }

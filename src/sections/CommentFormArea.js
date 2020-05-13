@@ -28,7 +28,6 @@ class CommentForm extends Component {
                     Posting your comment...
                 </div>
                 <div className="alert alert-warning" id="comment-alert-error" style={hiddenFeature}>
-                    <button type="button" className="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     Could not post your comment. Refresh the page and try again
                 </div>
                 <button type='submit' className='col-sm-4 form-control'>Comment</button>

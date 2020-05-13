@@ -7,6 +7,7 @@ parse() =>
 'This comment has a reference to <a href='/api/get/user/?username=jimmy'>@jimmy</a> from squarespace
 
 */
+import { userSearchUrl } from '../index';
 
 function paintComment (comment, paint) {
     /*
@@ -14,7 +15,7 @@ function paintComment (comment, paint) {
     'why would @kim do that to @bill, why?', ;@kim' => 
     'why would <a href='/api/get/user/?username=kim'>@kim</a> do that to @bill, why?'
     */
-    const link = `<a href='${window.api}/api/user/get/?username=${paint.split('@')[1]}'>${paint}</a>`;
+    const link = `<a href='${userSearchUrl}?username=${paint.split('@')[1]}'>${paint}</a>`;
     return comment.split(paint).join(link)
 }
 

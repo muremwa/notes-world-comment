@@ -1,6 +1,6 @@
 import dispatcher from '../dispatcher';
 import $ from 'jquery';
-import { noteCommentsApi } from '../index';
+import { noteCommentsApi, token } from '../index';
 
 
  export function fetchComments () {
@@ -31,6 +31,9 @@ export function deleteComment(commentDeleteUrl) {
         type: "DELETE",
         url: commentDeleteUrl,
         crossDomain: true,
+        data: {
+            csrfmiddlewaretoken: token
+        },
         success: function (response, commentId) {
             dispatcher.dispatch({
                 type: 'DELETE_COMMENT',
@@ -52,7 +55,8 @@ export function editComment (newComment, url, errorDiv) {
         url: url,
         crossDomain: true,
         data: {
-            'original_comment': newComment
+            original_comment: newComment,
+            csrfmiddlewaretoken: token
         },
         success: function (response) {
             if (response.success === true) {
@@ -62,7 +66,6 @@ export function editComment (newComment, url, errorDiv) {
                 });
             } else {
                 errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
                                         <strong>Error!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
                                     </div>`
             }
@@ -70,7 +73,6 @@ export function editComment (newComment, url, errorDiv) {
         error: function (err) {
             console.log('the following error occured', err.statusText);
             errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> \
                                         <strong>Error!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
                                     </div>`
         }
@@ -87,7 +89,8 @@ export function createComment (commentText) {
        url: noteCommentsApi,
        crossDomain: true,
        data: {
-           comment: commentText
+           comment: commentText,
+           csrfmiddlewaretoken: token
        },
        success: function (response) { 
             dispatcher.dispatch({
