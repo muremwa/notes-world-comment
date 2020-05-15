@@ -18,30 +18,40 @@ import { noteCommentsApi, token } from '../index';
             })
         },
         error: function (err) {
-            console.log('an error occured', err.statusText, err.status);
+            //
         }
     });
 }
 
-export function deleteComment(commentDeleteUrl) {
+export function deleteComment(commentDeleteUrl, commentId, target) {
     /* 
      delete a comment      
      */
     $.ajax({
-        type: "DELETE",
+        headers: {
+            'X-HTTP-Method-Override': 'DELETE'
+        },
+        type: "POST",
         url: commentDeleteUrl,
         crossDomain: true,
         data: {
             csrfmiddlewaretoken: token
         },
-        success: function (response, commentId) {
-            dispatcher.dispatch({
-                type: 'DELETE_COMMENT',
-                comment: commentId,
-            })
+        success: function (response) {
+            if (response.success === true){
+                dispatcher.dispatch({
+                    type: 'DELETE_COMMENT',
+                    comment: commentId,
+                })
+            } else {
+                target.classList.add('disabled');
+                target.innerText = 'Could not delete comment';
+            }
         },
         error: function (err) {
-            console.log('The following error occured =', err.statusText, err.status);
+            console.log('could not delete the comment', err.statusText, err.status);
+            target.classList.add('disabled');
+            target.innerText = 'Could not delete comment';            
         }
     })
 }
@@ -51,7 +61,10 @@ export function editComment (newComment, url, errorDiv) {
      edit a comment    
      */
     $.ajax({
-        type: 'PATCH',
+        headers: {
+            'X-HTTP-Method-Override': 'PATCH'
+        },
+        type: 'POST',
         url: url,
         crossDomain: true,
         data: {
@@ -71,7 +84,6 @@ export function editComment (newComment, url, errorDiv) {
             }
         },
         error: function (err) {
-            console.log('the following error occured', err.statusText);
             errorDiv.innerHTML = `<div class="alert alert-warning"> \
                                         <strong>Error!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
                                     </div>`
@@ -98,10 +110,10 @@ export function createComment (commentText) {
                 payload: response.comment,
             })
             document.getElementById('comment-alert-info').style.display = 'none';
+            document.getElementById('comment-alert-error').style.display = 'none';
             document.getElementById('id_comment').value = '';
        },
        error: function (err) {
-           console.log('an error occured', err.statusText, err.status);
            document.getElementById('comment-alert-info').style.display = 'none';
            document.getElementById('comment-alert-error').style.display = '';
        }

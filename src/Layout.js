@@ -79,10 +79,12 @@ class Layout extends Component {
 	render() {
 		const ownsNote = this.state.note.ownerId === this.state.user.id? true: false;
 		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment} ownsNote={ownsNote}/>)
+		const commentType = this.state.note.comments === 1? 'comment': 'comments';
+		const hasCommentMessage = this.state.note.comments === 0? 'no comments': `${this.state.note.comments} ${commentType}`;
 
 		return (
-			<div id="comments">
-				<h3>comments <small className="text-warning">{this.state.note.title} has {this.state.note.comments} comments</small></h3>
+			<div id="comments-section">
+				<h3>comments <small className="text-warning">{this.state.note.title} has {hasCommentMessage}</small></h3>
 				<CommentForm />
 				<hr />
 				<CommentSite noComments={this.state.commentsExist} comments={comments} noteTitle={this.state.note.title} />

@@ -110,8 +110,8 @@ class BottomAction extends Component {
                         // handle deletion of a comment
                         const url = e.target.attributes['data-url'].value;
                         const commentId = e.target.attributes['data-id'].value;
-                        e.target.parentElement.parentElement.parentElement.innerHTML = "<h2 class='text-center' style='margin-left: 20%'>comment deleted</h2>"
-                        deleteComment(url, commentId);
+                        e.target.innerText = 'Deleting comment';
+                        deleteComment(url, commentId, e.target);
                     }
                 },
                 {
@@ -119,7 +119,7 @@ class BottomAction extends Component {
                     actionUrl: '/flag/',
                     edit: false,
                     clickHandler: function (e) {
-                        console.log(e.target);
+                        console.log('flag coming soon');
                     }
                 },
             ]

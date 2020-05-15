@@ -73,6 +73,7 @@ class CommentStore extends EventEmitter {
     editComment (newComment) {
         const comment = this.comments.find(comment => comment.commentId === newComment.comment_id);
         comment.edited = true;
+        comment.replies = newComment.replies;
         comment.comment = newComment.comment;
         comment.uuid = newComment.new_key;
         this.emit('change');
@@ -80,7 +81,7 @@ class CommentStore extends EventEmitter {
 
     deleteComment(commentId) {
         // delete a comment from this.comments
-        const index = this.comments.findIndex(comment => comment.commentId === commentId);
+        const index = this.comments.findIndex(comment => comment.commentId === +commentId);
         this.comments.splice(index, 1);
         this.note.comments--;
         this.commentsExist = this.note.comments === 0? false: true;
@@ -106,7 +107,6 @@ class CommentStore extends EventEmitter {
                 break;
         
             default:
-                console.log(`no such ${action.type}`)
                 break;
         }
     }
