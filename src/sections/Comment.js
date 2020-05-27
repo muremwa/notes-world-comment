@@ -198,7 +198,7 @@ class Comment extends Component {
     render () {
         return (
             <div className="row text-primary comment" id={"comment"+this.props.commentId}>
-                <UserImage user={this.props.user} profile={'http://127.0.0.1:8000'+this.props.imageUrl}/>
+                <UserImage user={this.props.user} profile={this.props.imageUrl}/>
                 <CommentBody {...this.props}/>
                 <hr />
             </div>
