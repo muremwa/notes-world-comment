@@ -1,5 +1,6 @@
 import React from 'react';
 import { deleteComment, editComment } from '../../actions/CommentActions';
+import { token } from '../../index';
 
 
 function CommentEditForm (props) {
@@ -26,7 +27,6 @@ function CommentEditForm (props) {
 
         const alertDiv = document.getElementById(alertId);
         const newComment = document.getElementById(editId).value;
-        console.log(newComment)
         
         if (alertDiv) {
             alertDiv.classList.remove(alerts.WARNING.class);
@@ -36,7 +36,7 @@ function CommentEditForm (props) {
         }
 
         if (newComment !== commentText) {
-            editComment(newComment, url, () => {
+            editComment(event.target, url, () => {
                 alertDiv.classList.remove(alerts.INFO.class);
                 alertDiv.classList.add(alerts.WARNING.class);
                 alertDiv.innerHTML = alerts.WARNING.message;
@@ -50,8 +50,10 @@ function CommentEditForm (props) {
     return (
         <form className="row edit-comment-form" style={formStyle} id={formId} method="POST" onSubmit={editCommentHandler}>
 
+            <input type="hidden" name="csrfmiddlewaretoken" value={token} />
+
             <div className="form-group col-sm-7" name='edit-control'>
-                <textarea id={editId} className="form-control" rows="6" name='edit-comment' required defaultValue={commentText}></textarea>
+                <textarea id={editId} className="form-control" rows="6" name='original_comment' required defaultValue={commentText}></textarea>
             </div>
             <div className="form-group col-sm-2">
                 <input type="submit" className="btn btn-link form-control" value="edit" />
@@ -76,7 +78,7 @@ function DeleteCommentButton (props) {
         const url = event.target.action;
         const delBtn = event.target.children['del-btn'];
         delBtn? delBtn.value = 'deleting comment...': void 0;
-        deleteComment(url, commentId, () => {
+        deleteComment(url, event.target, commentId, () => {
             delBtn.disabled = true;
             delBtn.value = 'could not delete comment'
         });
@@ -84,6 +86,7 @@ function DeleteCommentButton (props) {
 
     return (
         <form className="col-sm-3 action-row-item" action={url} method='POST' onSubmit={deleteCommentHandler}>
+            <input type="hidden" name="csrfmiddlewaretoken" value={token} />
             <input type="submit" value="delete comment" className="btn text-danger" name='del-btn'/>
         </form>
     )

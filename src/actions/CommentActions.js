@@ -1,44 +1,43 @@
 import dispatcher from '../dispatcher';
-import $ from 'jquery';
+import ajax from './ajaxWrapper';
 import { noteCommentsApi, token } from '../index';
 
 
- export function fetchComments () {
+
+export function fetchComments (onError = null) {
      /* 
      fetch comments on load      
      */
-    $.ajax({
-        type: "GET",
+    const fetchOptions = {
         url: noteCommentsApi,
-        crossDomain: true,
-        success: function (response) {
+        responseType: 'json',
+        error: onError? onError: () => {},
+        success: (response) => {
             dispatcher.dispatch({
                 type: 'COMMENTS',
-                payload: response
+                payload: response.response
             })
-        },
-        error: function (err) {
-            //
         }
-    });
-}
+    };
 
-export function deleteComment(commentDeleteUrl, commentId, onError) {
+    ajax.get(fetchOptions);
+
+};
+
+
+export function deleteComment(commentDeleteUrl, form, commentId, onError) {
     /* 
-     delete a comment      
+     delete a comment
      */
-    $.ajax({
-        headers: {
-            'X-HTTP-Method-Override': 'DELETE'
-        },
-        type: "POST",
+    const deleteOptions = {
+        headers: [{
+            name: 'X-HTTP-Method-Override',
+            value: 'DELETE'
+        },],
         url: commentDeleteUrl,
-        crossDomain: true,
-        data: {
-            csrfmiddlewaretoken: token
-        },
-        success: function (response) {
-            if (response.success === true){
+        form,
+        success: (response) => {
+            if (response.response.success === true){
                 dispatcher.dispatch({
                     type: 'DELETE_COMMENT',
                     comment: commentId,
@@ -50,29 +49,30 @@ export function deleteComment(commentDeleteUrl, commentId, onError) {
         error: function (err) {
             onError()
         }
-    })
-}
+    };
 
-export function editComment (newComment, url, onError) {
+    ajax.post(deleteOptions);
+};
+
+
+export function editComment (form, url, onError) {
     /* 
      edit a comment    
      */
-    $.ajax({
-        headers: {
-            'X-HTTP-Method-Override': 'PATCH'
-        },
-        type: 'POST',
+    const editCommentOptions = {
+        headers: [
+            {
+                name: 'X-HTTP-Method-Override',
+                value: 'PATCH'   
+            },
+        ],
         url: url,
-        crossDomain: true,
-        data: {
-            original_comment: newComment,
-            csrfmiddlewaretoken: token
-        },
-        success: function (response) {
-            if (response.success === true) {
+        form,
+        success: (response) => {
+            if (response.response.success === true) {
                 dispatcher.dispatch ({
                     type: 'COMMENT_EDIT',
-                    payload: response
+                    payload: response.response
                 });
             } else {
                 onError()
@@ -81,34 +81,31 @@ export function editComment (newComment, url, onError) {
         error: function (err) {
             onError()
         }
-    })
-}
+    };
+
+    ajax.post(editCommentOptions);
+};
 
 
-export function createComment (commentText) {
+export function createComment (form, onSuccess = null, onError = null) {
     /*
     Create a new comment
     */
-   $.ajax({
-       type: 'POST',
+   const createCommentOptions = {
        url: noteCommentsApi,
-       crossDomain: true,
-       data: {
-           comment: commentText,
-           csrfmiddlewaretoken: token
-       },
+       form,
        success: function (response) { 
             dispatcher.dispatch({
                 type: 'COMMENT_CREATED',
-                payload: response.comment,
+                payload: response.response.comment,
             })
-            document.getElementById('comment-alert-info').style.display = 'none';
-            document.getElementById('comment-alert-error').style.display = 'none';
-            document.getElementById('id_comment').value = '';
+            onSuccess? onSuccess(): void 0;
        },
-       error: function (err) {
-           document.getElementById('comment-alert-info').style.display = 'none';
-           document.getElementById('comment-alert-error').style.display = '';
+       error: function () {
+           onError? onError(): void 0;
        }
-   })
-}
+   };
+
+   ajax.post(createCommentOptions);
+
+};
