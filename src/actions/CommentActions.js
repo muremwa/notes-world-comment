@@ -23,7 +23,7 @@ import { noteCommentsApi, token } from '../index';
     });
 }
 
-export function deleteComment(commentDeleteUrl, commentId, target) {
+export function deleteComment(commentDeleteUrl, commentId, onError) {
     /* 
      delete a comment      
      */
@@ -44,19 +44,16 @@ export function deleteComment(commentDeleteUrl, commentId, target) {
                     comment: commentId,
                 })
             } else {
-                target.classList.add('disabled');
-                target.innerText = 'Could not delete comment';
+                onError()
             }
         },
         error: function (err) {
-            console.log('could not delete the comment', err.statusText, err.status);
-            target.classList.add('disabled');
-            target.innerText = 'Could not delete comment';            
+            onError()
         }
     })
 }
 
-export function editComment (newComment, url, errorDiv) {
+export function editComment (newComment, url, onError) {
     /* 
      edit a comment    
      */
@@ -78,15 +75,11 @@ export function editComment (newComment, url, errorDiv) {
                     payload: response
                 });
             } else {
-                errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <strong>Error!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
-                                    </div>`
+                onError()
             }
         },
         error: function (err) {
-            errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <strong>Error!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
-                                    </div>`
+            onError()
         }
     })
 }

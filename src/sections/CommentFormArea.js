@@ -26,12 +26,12 @@ class CommentForm extends Component {
 
                 <div id="comment-alert-info" className="alert alert-info alert-dismissible fade show" role="alert" style={hiddenFeature}>
                     <p>Posting your comment...</p>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
                 <div id="comment-alert-error" className="alert alert-warning alert-dismissible fade show" role="alert" style={hiddenFeature}>
                     <p>Could not post your comment. Refresh the page and try again</p>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
                 <div className="col-sm-4">

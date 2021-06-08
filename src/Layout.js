@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CommentForm from './sections/CommentFormArea';
-import Comment from './sections/Comment';
+import Comment from './sections/comments/Comment';
 import * as CommentActions  from './actions/CommentActions';
 
 import CommentStore from './stores/CommentStore';
