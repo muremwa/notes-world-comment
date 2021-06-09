@@ -40,7 +40,7 @@ function CommentBody (props) {
             <div className="comment-text" name='comment-text'>
                 <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
             </div>
-            <BottomAction id={commentId} ownsNote={ownsNote} comment={comment} editable={editable} replyUrl={replyUrl} actionUrl={actionUrl}/>
+            <BottomAction {...{commentId, ownsNote, comment, editable, replyUrl, actionUrl}} />
         </div>
     );
 };

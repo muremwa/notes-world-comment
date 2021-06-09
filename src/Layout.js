@@ -121,7 +121,7 @@ export default function Layout () {
 					<img src={loadingGif} alt="loading gif" id="load-gif" />
 				</div>
 			</div>
-			<h3>comments <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
+			<h3>comments <br/> <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
 			<CommentForm />
 			<hr />
 			<CommentSite errorLoading={errorLoading} noComments={commentsExist} comments={comments} noteTitle={note.title} />

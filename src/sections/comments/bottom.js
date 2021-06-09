@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { deleteComment, editComment } from '../../actions/CommentActions';
 import { token } from '../../index';
 
@@ -94,9 +95,9 @@ function DeleteCommentButton (props) {
 
 
 export default function BottomAction (props) {
-    const { ownsNote, editable, replyUrl, actionUrl, id, comment } = props;
-    const formId = editable? `comment-${id}-edit`: null;
-    const editId = editable? `comment-${id}-textarea`: null;
+    const { ownsNote, editable, replyUrl, actionUrl, commentId, comment } = props;
+    const formId = editable? `comment-${commentId}-edit`: null;
+    const editId = editable? `comment-${commentId}-textarea`: null;
     const alertId = editable? `${formId}-alert`: null;
     
     const formToogle = editable? (open = false) => {
@@ -116,9 +117,9 @@ export default function BottomAction (props) {
             <div className="row action-row">
                 <a href={replyUrl} className="col-sm-2 btn action-row-item">reply</a>
                 {editable? <button className="col-sm-3 btn action-row-item" onClick={() => formToogle(false)}>edit comment</button>: void 0}
-                {editable || ownsNote? <DeleteCommentButton url={actionUrl} commentId={id} />: void 0}
+                {editable || ownsNote? <DeleteCommentButton {...{url: actionUrl, commentId}} />: void 0}
             </div>
-            {editable? <CommentEditForm url={actionUrl} formToogle={formToogle} formId={formId} editId={editId} alertId={alertId} commentText={comment} />: null}
+            {editable? <CommentEditForm {...{formToogle, formId, editId, alertId, url: actionUrl, commentText: comment}} />: null}
         </div>
     )
 };
