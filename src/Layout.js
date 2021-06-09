@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+
+import loadingGif from './img/l.gif';
+
 import CommentForm from './sections/CommentFormArea';
 import Comment from './sections/comments/Comment';
 import { fetchComments }  from './actions/CommentActions';
@@ -87,6 +90,11 @@ export default function Layout () {
 		commentsExistChanger(commentStore.commentsExist);
 	};
 
+	const reloadComments = (event) => {
+		toggleLoadGif(false);
+		loadDataChanger(true);
+	};
+
 	
 	useEffect(() => {
 		commentStore.on(storeEvents.FETCH_INIT_DATA, loadComments);
@@ -102,10 +110,10 @@ export default function Layout () {
 		<div id="comments-section">
 			<div className="row" id="loading-dock">
 				<div className="col">
-					<button className="btn btn-outline-info">reload comments</button>
+					<button onClick={reloadComments} className="btn btn-link">reload comments</button>
 				</div>
 				<div id="image-h" className="col">
-					<img src="http://127.0.0.1:8000/static/img/l.gif" alt="loading gif" id="load-gif" />
+					<img src={loadingGif} alt="loading gif" id="load-gif" />
 				</div>
 			</div>
 			<h3>comments <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
