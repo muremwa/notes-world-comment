@@ -4,14 +4,14 @@ import { noteCommentsApi } from '../index';
 
 
 
-export function fetchComments (onError = null) {
+export function fetchComments (onError = () => {}) {
      /* 
      fetch comments on load      
      */
     const fetchOptions = {
         url: noteCommentsApi,
         responseType: 'json',
-        error: onError? onError: () => {},
+        error: onError,
         success: (response) => {
             dispatcher.dispatch({
                 type: 'COMMENTS',
@@ -87,7 +87,7 @@ export function editComment (form, url, onError) {
 };
 
 
-export function createComment (form, onSuccess = null, onError = null) {
+export function createComment (form, onSuccess = () => {}, onError = () => {}) {
     /*
     Create a new comment
     */
@@ -99,10 +99,10 @@ export function createComment (form, onSuccess = null, onError = null) {
                 type: 'COMMENT_CREATED',
                 payload: response.response.comment,
             })
-            onSuccess? onSuccess(): void 0;
+            onSuccess();
        },
        error: function () {
-           onError? onError(): void 0;
+           onError();
        }
    };
 

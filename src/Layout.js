@@ -9,11 +9,11 @@ import commentStore, { storeEvents } from './stores/CommentStore';
 
 
 
-function LoadingComments () {
+function LoadingComments (props) {
 	/* 
     Show comments are loading
     */
-	return <h2>Loading comments...</h2>
+	return <h2>{props.errorLoading? 'Could not load comments. Refresh the page or click "reload comments"': 'Loading comments...'}</h2>
 }
 
 function NoCommentsAvalible (props) {
@@ -35,7 +35,7 @@ function CommentSite (props) {
 		return <NoCommentsAvalible noteTitle={props.noteTitle} />
 	} else {
 		if (props.comments.length === 0) {
-			return <LoadingComments />
+			return <LoadingComments errorLoading={props.errorLoading} />
 		} else {
 			return (
 				<div>
@@ -53,6 +53,7 @@ export default function Layout () {
 	const [ comments, commentsChanger ] = useState([]);
 	const [ commentsExist, commentsExistChanger ] = useState(true);
 	const [ loadData, loadDataChanger ] = useState(true);
+	const [ errorLoading, errorChanger ] = useState(false);
 
 	const toggleLoadGif = (open = false) => {
 		const g = document.getElementById('load-gif');
@@ -61,7 +62,10 @@ export default function Layout () {
 
 	if (loadData) {
 		toggleLoadGif(false);
-		fetchComments();
+		fetchComments(() => {
+			toggleLoadGif(true);
+			errorChanger(true);
+		});
 		loadDataChanger(false);
 	};
 
@@ -93,6 +97,7 @@ export default function Layout () {
 	const reloadComments = (event) => {
 		toggleLoadGif(false);
 		loadDataChanger(true);
+		errorChanger(false);
 	};
 
 	
@@ -119,7 +124,7 @@ export default function Layout () {
 			<h3>comments <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
 			<CommentForm />
 			<hr />
-			<CommentSite noComments={commentsExist} comments={comments} noteTitle={note.title} />
+			<CommentSite errorLoading={errorLoading} noComments={commentsExist} comments={comments} noteTitle={note.title} />
 		</div>
 	);
 };
