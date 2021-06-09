@@ -1,7 +1,8 @@
-import React,{ Component } from "react";
+import React from "react";
 import parseComment from '../../logic/CommentParse';
 
 import BottomAction from './bottom';
+
 
 function UserImage(props) {
     /* 
@@ -22,44 +23,35 @@ function Edited (props) {
     return <span className="text-info">edited</span>;
 }
 
-class CommentBody extends Component {
-    render () {
-        const {name, user, time, edited, replies, comment} = this.props;
-        const cleanComment = parseComment(comment);
 
-        return (
-            <div className="col-sm-11">
-                <span className="comment-info">
-                    <strong>{name} </strong> 
-                    <small className="text-danger">@{user} </small> 
-                    posted <strong className="dated">{time} </strong>
-                    <Edited edited={edited} />
-                    <span className="text-info"> {replies} replies</span>
-                </span>
-                <div className="comment-text" name='comment-text'>
-                    <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
-                </div>
-                <BottomAction id={this.props.commentId} ownsNote={this.props.ownsNote} comment={comment} editable={this.props.editable} replyUrl={this.props.replyUrl} actionUrl={this.props.actionUrl}/>
+function CommentBody (props) {
+    const { name, user, time, edited, replies, comment, commentId, ownsNote, editable, replyUrl, actionUrl } = props;
+    const cleanComment = parseComment(comment);
+
+    return (
+        <div className="col-sm-11">
+            <span className="comment-info">
+                <strong>{name} </strong> 
+                <small className="text-danger">@{user} </small> 
+                posted <strong className="dated">{time} </strong>
+                <Edited edited={edited} />
+                <span className="text-info"> {replies} replies</span>
+            </span>
+            <div className="comment-text" name='comment-text'>
+                <p dangerouslySetInnerHTML={{__html: cleanComment}}></p>
             </div>
-        );
-    }
-}
+            <BottomAction id={commentId} ownsNote={ownsNote} comment={comment} editable={editable} replyUrl={replyUrl} actionUrl={actionUrl}/>
+        </div>
+    );
+};
 
 
-class Comment extends Component {
-    /* 
-    The whole comment container
-    */
-    render () {
-        return (
-            <div className="row text-primary comment" id={"comment"+this.props.commentId}>
-                <UserImage user={this.props.user} profile={this.props.imageUrl}/>
-                <CommentBody {...this.props}/>
-                <hr />
-            </div>
-        )
-    }
-}
-
-
-export default Comment;
+export default function Comment (props) {
+    return (
+        <div className="row text-primary comment" id={`comment${props.commentId}`}>
+            <UserImage user={props.user} profile={props.imageUrl}/>
+            <CommentBody {...props}/>
+            <hr />
+        </div>
+    )
+};
