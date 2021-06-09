@@ -1,4 +1,4 @@
-import dispatcher from '../dispatcher';
+import dispatcher from '../dispatcher/dispatcher';
 import ajax from './ajaxWrapper';
 import { noteCommentsApi } from '../index';
 
