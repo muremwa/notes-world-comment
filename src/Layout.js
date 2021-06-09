@@ -51,7 +51,13 @@ export default function Layout () {
 	const [ commentsExist, commentsExistChanger ] = useState(true);
 	const [ loadData, loadDataChanger ] = useState(true);
 
+	const toggleLoadGif = (open = false) => {
+		const g = document.getElementById('load-gif');
+		g? g.style.visibility = open? 'hidden': 'visible': void 0;
+	};
+
 	if (loadData) {
+		toggleLoadGif(false);
 		fetchComments();
 		loadDataChanger(false);
 	};
@@ -71,6 +77,7 @@ export default function Layout () {
 		noteChanger(commentStore.getNote());
 		userChanger(commentStore.getUser());
 		commentsChanger(makeComments(commentStore.getComments()));
+		toggleLoadGif(true);
 	};
 
 	// A comment has been updated
@@ -93,6 +100,14 @@ export default function Layout () {
 
 	return (
 		<div id="comments-section">
+			<div className="row" id="loading-dock">
+				<div className="col">
+					<button className="btn btn-outline-info">reload comments</button>
+				</div>
+				<div id="image-h" className="col">
+					<img src="http://127.0.0.1:8000/static/img/l.gif" alt="loading gif" id="load-gif" />
+				</div>
+			</div>
 			<h3>comments <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
 			<CommentForm />
 			<hr />
