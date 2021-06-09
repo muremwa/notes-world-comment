@@ -38,3 +38,22 @@ body {
 .comment-text p a {
 	color: brown;
 }
+
+
+#loading-dock {
+	height: 4em;
+	border-radius: 5px;
+	background-color: #f1f1f1;
+}
+
+#loading-dock button {
+	width: 50%;
+}
+
+#image-h {
+	text-align: right;
+}
+
+#load-gif {
+	height: 100%;
+};

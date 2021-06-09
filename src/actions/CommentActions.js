@@ -1,121 +1,111 @@
-import dispatcher from '../dispatcher';
-import $ from 'jquery';
-import { noteCommentsApi, token } from '../index';
+import dispatcher from '../dispatcher/dispatcher';
+import ajax from './ajaxWrapper';
+import { noteCommentsApi } from '../index';
 
 
- export function fetchComments () {
+
+export function fetchComments (onError = () => {}) {
      /* 
      fetch comments on load      
      */
-    $.ajax({
-        type: "GET",
+    const fetchOptions = {
         url: noteCommentsApi,
-        crossDomain: true,
-        success: function (response) {
+        responseType: 'json',
+        error: onError,
+        success: (response) => {
             dispatcher.dispatch({
                 type: 'COMMENTS',
-                payload: response
+                payload: response.response
             })
-        },
-        error: function (err) {
-            //
         }
-    });
-}
+    };
 
-export function deleteComment(commentDeleteUrl, commentId, target) {
+    ajax.get(fetchOptions);
+
+};
+
+
+export function deleteComment(commentDeleteUrl, form, commentId, onError) {
     /* 
-     delete a comment      
+     delete a comment
      */
-    $.ajax({
-        headers: {
-            'X-HTTP-Method-Override': 'DELETE'
-        },
-        type: "POST",
+    const deleteOptions = {
+        headers: [{
+            name: 'X-HTTP-Method-Override',
+            value: 'DELETE'
+        },],
         url: commentDeleteUrl,
-        crossDomain: true,
-        data: {
-            csrfmiddlewaretoken: token
-        },
-        success: function (response) {
-            if (response.success === true){
+        form,
+        success: (response) => {
+            if (response.response.success === true){
                 dispatcher.dispatch({
                     type: 'DELETE_COMMENT',
                     comment: commentId,
                 })
             } else {
-                target.classList.add('disabled');
-                target.innerText = 'Could not delete comment';
+                onError()
             }
         },
         error: function (err) {
-            console.log('could not delete the comment', err.statusText, err.status);
-            target.classList.add('disabled');
-            target.innerText = 'Could not delete comment';            
+            onError()
         }
-    })
-}
+    };
 
-export function editComment (newComment, url, errorDiv) {
+    ajax.post(deleteOptions);
+};
+
+
+export function editComment (form, url, onError) {
     /* 
      edit a comment    
      */
-    $.ajax({
-        headers: {
-            'X-HTTP-Method-Override': 'PATCH'
-        },
-        type: 'POST',
+    const editCommentOptions = {
+        headers: [
+            {
+                name: 'X-HTTP-Method-Override',
+                value: 'PATCH'   
+            },
+        ],
         url: url,
-        crossDomain: true,
-        data: {
-            original_comment: newComment,
-            csrfmiddlewaretoken: token
-        },
-        success: function (response) {
-            if (response.success === true) {
+        form,
+        success: (response) => {
+            if (response.response.success === true) {
                 dispatcher.dispatch ({
                     type: 'COMMENT_EDIT',
-                    payload: response
+                    payload: response.response
                 });
             } else {
-                errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <strong>Error!</strong> Could not edit your comment: ${response.error_message}. Refresh the page and try again... \
-                                    </div>`
+                onError()
             }
         },
         error: function (err) {
-            errorDiv.innerHTML = `<div class="alert alert-warning"> \
-                                        <strong>Error!</strong> Could not edit your comment: ${err.statusText}. Refresh the page and try again... \
-                                    </div>`
+            onError()
         }
-    })
-}
+    };
+
+    ajax.post(editCommentOptions);
+};
 
 
-export function createComment (commentText) {
+export function createComment (form, onSuccess = () => {}, onError = () => {}) {
     /*
     Create a new comment
     */
-   $.ajax({
-       type: 'POST',
+   const createCommentOptions = {
        url: noteCommentsApi,
-       crossDomain: true,
-       data: {
-           comment: commentText,
-           csrfmiddlewaretoken: token
-       },
+       form,
        success: function (response) { 
             dispatcher.dispatch({
                 type: 'COMMENT_CREATED',
-                payload: response.comment,
+                payload: response.response.comment,
             })
-            document.getElementById('comment-alert-info').style.display = 'none';
-            document.getElementById('comment-alert-error').style.display = 'none';
-            document.getElementById('id_comment').value = '';
+            onSuccess();
        },
-       error: function (err) {
-           document.getElementById('comment-alert-info').style.display = 'none';
-           document.getElementById('comment-alert-error').style.display = '';
+       error: function () {
+           onError();
        }
-   })
-}
+   };
+
+   ajax.post(createCommentOptions);
+
+};

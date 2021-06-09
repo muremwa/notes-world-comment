@@ -1,9 +1,15 @@
 import { EventEmitter } from 'events';
 
-import dispatcher from '../dispatcher';
+import dispatcher from '../dispatcher/dispatcher';
 
 
+export const storeEvents = {
+    FETCH_INIT_DATA: 'fetch_init_data',
+    COMMENTS_UPDATE: 'comments_update',
+    UPDATE: 'change'
+};
 class CommentStore extends EventEmitter {
+
     constructor () {
         super();
         this.user = {};
@@ -13,7 +19,8 @@ class CommentStore extends EventEmitter {
     }
 
     getComments () {
-        return this.comments;
+        const c = Array.isArray(this.comments)? this.comments: [];
+        return c;
     }
 
     getNote () {
@@ -59,7 +66,7 @@ class CommentStore extends EventEmitter {
             fullName: payload.user.full_name,
             profileUrl: payload.user.profile,
         };
-        this.emit('change');
+        this.emit(storeEvents.FETCH_INIT_DATA);
     }
 
     createComment (newComment) {
@@ -67,7 +74,7 @@ class CommentStore extends EventEmitter {
         this.comments.unshift(cleanComment);
         this.commentsExist = true;
         this.note.comments++;
-        this.emit('change');
+        this.emit(storeEvents.COMMENTS_UPDATE);
     }
 
     editComment (newComment) {
@@ -76,7 +83,7 @@ class CommentStore extends EventEmitter {
         comment.replies = newComment.replies;
         comment.comment = newComment.comment;
         comment.uuid = newComment.new_key;
-        this.emit('change');
+        this.emit(storeEvents.COMMENTS_UPDATE);
     }
 
     deleteComment(commentId) {
@@ -85,7 +92,7 @@ class CommentStore extends EventEmitter {
         this.comments.splice(index, 1);
         this.note.comments--;
         this.commentsExist = this.note.comments === 0? false: true;
-        this.emit('change');
+        this.emit(storeEvents.COMMENTS_UPDATE);
     }
 
     handleActions (action) {

@@ -1,16 +1,19 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import loadingGif from './img/l.gif';
+
 import CommentForm from './sections/CommentFormArea';
-import Comment from './sections/Comment';
-import * as CommentActions  from './actions/CommentActions';
+import Comment from './sections/comments/Comment';
+import { fetchComments }  from './actions/CommentActions';
+import commentStore, { storeEvents } from './stores/CommentStore';
 
-import CommentStore from './stores/CommentStore';
 
 
-function LoadingComments () {
+function LoadingComments (props) {
 	/* 
     Show comments are loading
     */
-	return <h2>Loading comments...</h2>
+	return <h2>{props.errorLoading? 'Could not load comments. Refresh the page or click "reload comments"': 'Loading comments...'}</h2>
 }
 
 function NoCommentsAvalible (props) {
@@ -32,7 +35,7 @@ function CommentSite (props) {
 		return <NoCommentsAvalible noteTitle={props.noteTitle} />
 	} else {
 		if (props.comments.length === 0) {
-			return <LoadingComments />
+			return <LoadingComments errorLoading={props.errorLoading} />
 		} else {
 			return (
 				<div>
@@ -43,54 +46,85 @@ function CommentSite (props) {
 	}
 }
 
-class Layout extends Component {
-	constructor () {
-		super();
-    	this.getComments = this.getComments.bind(this);
-    	this.state = {
-			note: CommentStore.getNote(),
-			user: CommentStore.getUser(),
-			comments: CommentStore.getComments(),
-			commentsExist: CommentStore.commentsExist
-    	}
-	}
 
+export default function Layout () {		
+	const [ note, noteChanger ] = useState({});
+	const [ user, userChanger ] = useState({});
+	const [ comments, commentsChanger ] = useState([]);
+	const [ commentsExist, commentsExistChanger ] = useState(true);
+	const [ loadData, loadDataChanger ] = useState(true);
+	const [ errorLoading, errorChanger ] = useState(false);
 
-  	componentWillMount() {
-    	CommentActions.fetchComments();
-		CommentStore.on('change', this.getComments);
-	}
-	  
-	componentWillUnmount () {
-		CommentStore.removeListener('change', this.getComments)
-	}
+	const toggleLoadGif = (open = false) => {
+		const g = document.getElementById('load-gif');
+		g? g.style.visibility = open? 'hidden': 'visible': void 0;
+	};
+
+	if (loadData) {
+		toggleLoadGif(false);
+		fetchComments(() => {
+			toggleLoadGif(true);
+			errorChanger(true);
+		});
+		loadDataChanger(false);
+	};
+
+	const hasCommentMessage = !note.comments || note.comments === 0? 'no comments': `${note.comments} ${note.comments === 1? 'comment': 'comments'}`;
+
+	// create <Comment />
+	const makeComments = (comments_ = []) => {
+		return comments_.map((comment) => {
+			return <Comment key={comment.uuid} {...comment} ownsNote={note.ownerId === user.id? true: false}/>
+		});
+	};
+
+	// load fresh comments from server
+	const loadComments = () => {
+		commentsExistChanger(commentStore.commentsExist);
+		noteChanger(commentStore.getNote());
+		userChanger(commentStore.getUser());
+		commentsChanger(makeComments(commentStore.getComments()));
+		toggleLoadGif(true);
+	};
+
+	// A comment has been updated
+	const updateComments = () => {
+		noteChanger(commentStore.getNote());
+		commentsChanger(makeComments(commentStore.getComments()));
+		commentsExistChanger(commentStore.commentsExist);
+	};
+
+	const reloadComments = (event) => {
+		toggleLoadGif(false);
+		loadDataChanger(true);
+		errorChanger(false);
+	};
+
 	
+	useEffect(() => {
+		commentStore.on(storeEvents.FETCH_INIT_DATA, loadComments);
+		commentStore.on(storeEvents.COMMENTS_UPDATE, updateComments);
+		
+		return () => {
+			commentStore.removeListener(storeEvents.FETCH_INIT_DATA, loadComments);
+			commentStore.removeListener(storeEvents.COMMENTS_UPDATE, updateComments);
+		};
+	});
 
-	getComments () {
-		this.setState({
-			comments: CommentStore.getComments(),
-			note: CommentStore.getNote(),
-			user: CommentStore.getUser(),
-			commentsExist: CommentStore.commentsExist,
-		})
-	}
-
-
-	render() {
-		const ownsNote = this.state.note.ownerId === this.state.user.id? true: false;
-		let comments = this.state.comments.map((comment) => <Comment key={comment.uuid} {...comment} ownsNote={ownsNote}/>)
-		const commentType = this.state.note.comments === 1? 'comment': 'comments';
-		const hasCommentMessage = this.state.note.comments === 0? 'no comments': `${this.state.note.comments} ${commentType}`;
-
-		return (
-			<div id="comments-section">
-				<h3>comments <small className="text-warning">{this.state.note.title} has {hasCommentMessage}</small></h3>
-				<CommentForm />
-				<hr />
-				<CommentSite noComments={this.state.commentsExist} comments={comments} noteTitle={this.state.note.title} />
+	return (
+		<div id="comments-section">
+			<div className="row" id="loading-dock">
+				<div className="col">
+					<button onClick={reloadComments} className="btn btn-link">reload comments</button>
+				</div>
+				<div id="image-h" className="col">
+					<img src={loadingGif} alt="loading gif" id="load-gif" />
+				</div>
 			</div>
-		);
-	}
-}
-
-export default Layout;
+			<h3>comments <br/> <small className="text-warning">{note.title} has {hasCommentMessage}</small></h3>
+			<CommentForm />
+			<hr />
+			<CommentSite errorLoading={errorLoading} noComments={commentsExist} comments={comments} noteTitle={note.title} />
+		</div>
+	);
+};
