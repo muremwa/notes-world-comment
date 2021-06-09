@@ -1,6 +1,6 @@
 import dispatcher from '../dispatcher';
 import ajax from './ajaxWrapper';
-import { noteCommentsApi, token } from '../index';
+import { noteCommentsApi } from '../index';
 
 
 
