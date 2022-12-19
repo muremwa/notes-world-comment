@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { deleteComment, editComment } from '../../actions/CommentActions';
-import { token } from '../../index';
 
 
 function CommentEditForm (props) {
@@ -45,15 +44,12 @@ function CommentEditForm (props) {
             });
         } else {
             formToogle(true);
-        };
+        }
     };
 
     return (
         <form className="row edit-comment-form" style={formStyle} id={formId} method="POST" onSubmit={editCommentHandler}>
-
-            <input type="hidden" name="csrfmiddlewaretoken" value={token} />
-
-            <div className="form-group col-sm-7" name='edit-control'>
+            <div className="form-group col-sm-7">
                 <textarea id={editId} className="form-control" rows="6" name='original_comment' required defaultValue={commentText}></textarea>
             </div>
             <div className="form-group col-sm-2">
@@ -63,12 +59,12 @@ function CommentEditForm (props) {
                 <input type="button" onClick={() => formToogle(true)} className="btn btn-link text-danger close-edit" value="close"/>
             </div>
 
-            <div id={alertId} name="comment-edit-alert" className="alert alert-info" role="alert" style={formStyle}>
+            <div id={alertId} className="alert alert-info" role="alert" style={formStyle}>
                 posting your edited comment...
             </div>
         </form>
     )
-};
+}
 
 
 function DeleteCommentButton (props) {
@@ -87,11 +83,10 @@ function DeleteCommentButton (props) {
 
     return (
         <form className="col-sm-3 action-row-item" action={url} method='POST' onSubmit={deleteCommentHandler}>
-            <input type="hidden" name="csrfmiddlewaretoken" value={token} />
             <input type="submit" value="delete comment" className="btn text-danger" name='del-btn'/>
         </form>
     )
-};
+}
 
 
 export default function BottomAction (props) {
