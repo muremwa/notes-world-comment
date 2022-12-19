@@ -1,13 +1,14 @@
 /* 
 Receive a comment and check whether it has a username in it the add link for it
-Eg. 'This comment has a refrence to @jimmy from squarespace'
+eg 'This comment has a reference to @jimmy from squarespace'
 
 parse() => 
 
 'This comment has a reference to <a href='/api/get/user/?username=jimmy'>@jimmy</a> from squarespace
 
 */
-import { userSearchUrl } from '../index';
+// TODO: REMOVE
+const userSearchUrl = '';
 
 function paintComment (comment, paint) {
     /*
@@ -28,7 +29,7 @@ export default function parseComment (comment) {
     if (users !== null) {
         for (let user of users) {
             newComment = paintComment(newComment, user);
-        };
+        }
     }
 
     return newComment;

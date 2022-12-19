@@ -1,9 +1,8 @@
 import React from 'react';
 import { createComment } from '../actions/CommentActions';
-import { token } from '../index';
 
 
-export default function () {
+export default function CommentFormArea () {
     const hiddenFeature = {display: 'none'};
 
     const handleCreateComment = (event) => {
@@ -28,7 +27,7 @@ export default function () {
             alertDiv.classList.add(alerts.INFO.class);
             alertMessageDiv.innerText = alerts.INFO.message;
             alertDiv.style.display = '';
-        };
+        }
 
         createComment(event.target, () => {
             alertDiv.style.display = 'none';
@@ -47,10 +46,7 @@ export default function () {
 
     return (
         <form method="post" encType="multipart/form-data" onSubmit={handleCreateComment}>
-
-            <input type="hidden" value={token} name="csrfmiddlewaretoken" />
-
-            <div className="form-group" name='comment-textarea-group'>
+            <div className="form-group">
                 <label>Comment:</label>
                 <textarea name='comment' className="form-control" cols="40" rows="10" maxLength="140" required id="id_comment" placeholder="add comment here (use '@username' to mention someone)"></textarea>
             </div>
