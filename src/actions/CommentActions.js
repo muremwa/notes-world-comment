@@ -1,28 +1,26 @@
 import dispatcher from '../dispatcher/dispatcher';
+import { storeEvents } from '../stores/CommentStore';
 import ajax from './ajaxWrapper';
 import { noteCommentsApi } from '../index';
 
 
-
-export function fetchComments (onError = () => {}) {
-     /* 
-     fetch comments on load      
-     */
-    const fetchOptions = {
-        url: noteCommentsApi,
-        responseType: 'json',
-        error: onError,
-        success: (response) => {
-            dispatcher.dispatch({
-                type: 'COMMENTS',
-                payload: response.response
-            })
+/**
+* @param {() => void} onError Callback for an error occurred
+* */
+export function fetchComments (onError) {
+    // fetch comments on load and populate notes and user details
+    fetch(noteCommentsApi, {
+        // TODO: REMOVE this header
+        headers: {
+            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
         }
-    };
-
-    ajax.get(fetchOptions);
-
-};
+    }).then((resp) => resp.json()).then((data) => {
+        dispatcher.dispatch({
+            type: storeEvents.FETCH_INIT_DATA,
+            payload: data
+        })
+    }).catch(() => onError());
+}
 
 
 export function deleteComment(commentDeleteUrl, form, commentId, onError) {
