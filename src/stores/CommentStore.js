@@ -5,6 +5,7 @@ import cleaner from "./utility";
 export const storeEvents = {
     FETCH_INIT_DATA: 'fetch_init_data',
     COMMENTS_UPDATE: 'comments_update',
+    COMMENT_EDIT: 'comment_edit',
     UPDATE: 'change'
 };
 
@@ -25,6 +26,11 @@ class CommentStore extends EventEmitter {
                 this.note = payload['notesInfo'];
                 this.user.ownsNote = this.note.user.id === this.user.id;
                 this.emit(storeEvents.FETCH_INIT_DATA)
+                break;
+
+            case storeEvents.COMMENTS_UPDATE:
+                this.note.comments.unshift(payload);
+                this.emit(storeEvents.COMMENTS_UPDATE);
                 break;
 
             default:

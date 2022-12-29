@@ -1,42 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import CommentForm from './sections/CommentFormArea';
+
 import { fetchComments } from './actions/CommentActions';
 import store, { storeEvents } from './stores/CommentStore';
-import loadingGif from "./img/l.gif";
 
 import './App.css';
+import loadingGif from "./img/l.gif";
 
 
 export default function App () {
-    const [note, updateNote] = useState(null);
-    const [user, updateUser] = useState(null);
-    const [initData, updateInitData] = useState(true); // shall we load initial data
-    const [error, updateError] = useState(false); // an error occurred loading the comment section
+    const [note, setNote] = useState(null);
+    const [user, setUser] = useState(null);
+    const [initData, setInitData] = useState(true); // shall we load initial data
+    const [error, setError] = useState(false); // an error occurred loading the comment section
 
     const reloadData = () => {
-        updateNote(null);
-        updateUser(null);
-        updateError(false);
-        updateInitData(true);
+        setNote(null);
+        setUser(null);
+        setError(false);
+        setInitData(true);
     };
 
     // load init data
     if (initData) {
-        updateInitData(false);
-        fetchComments(() => updateError(true));
+        setInitData(false);
+        fetchComments(() => setError(true));
     }
 
     // listen to events from the store
     useEffect(() => {
         const initDataUpdate = () => {
-            updateUser(store.user);
-            updateNote(store.note);
+            setUser(store.user);
+            setNote(store.note);
         };
+
+        const commentsUpdate = () => {
+            setNote({
+                ...note,
+                comments: store.note.comments
+            });
+        };
+
         store.on(storeEvents.FETCH_INIT_DATA, initDataUpdate);
+        store.on(storeEvents.COMMENTS_UPDATE, commentsUpdate);
 
         return () => {
             store.removeListener(storeEvents.FETCH_INIT_DATA, initDataUpdate)
+            store.removeListener(storeEvents.COMMENTS_UPDATE, commentsUpdate)
         };
-    })
+    });
 
     // error occurred
     if (error) {
@@ -69,7 +81,12 @@ export default function App () {
                 </div>
             </div>
 
-            <h3>comments <br/> { note.note } by { note.user.username } has {commentsMessage()}</h3>
+            <h3>
+                comments <br/>
+                <small className="text-warning">{ note.note } by { note.user.username } has {commentsMessage()}</small>
+            </h3>
+
+            <CommentForm />
         </div>
     );
 }

@@ -10,6 +10,7 @@ import { noteCommentsApi } from '../index';
 export function fetchComments (onError) {
     // fetch comments on load and populate notes and user details
     fetch(noteCommentsApi, {
+        credentials: 'include',
         // TODO: REMOVE this header
         headers: {
             Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
@@ -85,25 +86,32 @@ export function editComment (form, url, onError) {
 };
 
 
-export function createComment (form, onSuccess = () => {}, onError = () => {}) {
-    /*
-    Create a new comment
-    */
-   const createCommentOptions = {
-       url: noteCommentsApi,
-       form,
-       success: function (response) { 
-            dispatcher.dispatch({
-                type: 'COMMENT_CREATED',
-                payload: response.response.comment,
-            })
-            onSuccess();
-       },
-       error: function () {
-           onError();
-       }
-   };
-
-   ajax.post(createCommentOptions);
-
-};
+/**
+ * @param {FormData} commentFormData 'comment to be posted'
+ * @param {() => void} successCallback 'function run on success posting'
+ * @param {() => void} errorCallback 'function run if an error occurs'
+ * */
+export function createComment (commentFormData, successCallback, errorCallback) {
+    fetch(noteCommentsApi, {
+        method: 'POST',
+        body: commentFormData,
+        credentials: 'include',
+        // TODO: REMOVE HEADER
+        headers: {
+            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
+        }
+    }).then((payload) => {
+        if (payload.ok) {
+            return payload.json();
+        } else {
+            throw new Error(`${payload.status}: ${payload.statusText}`)
+        }
+    }).then((data) => {
+        // comment posted successfully
+        successCallback();
+        dispatcher.dispatch({
+            type: storeEvents.COMMENTS_UPDATE,
+            payload: data.comment
+        });
+    }).catch(() => errorCallback());
+}
