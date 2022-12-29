@@ -1,59 +1,78 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { createComment } from '../actions/CommentActions';
+
+import './CommentFormArea.css';
+import loadingGif from '../img/l.gif';
+
+
+function TextArea () {
+    return (
+        <textarea
+            name='comment'
+            className="form-control"
+            cols="40"
+            maxLength="140"
+            id="id_comment"
+            placeholder="add comment here (use '@username' to mention someone)"
+            required
+        ></textarea>
+    );
+}
 
 
 export default function CommentFormArea () {
-    const hiddenFeature = {display: 'none'};
+    const messageZone = useRef(null);
+    const errorZone = useRef(null);
+    const formRef = useRef(null);
 
-    const handleCreateComment = (event) => {
-        event.preventDefault();
-        const alerts = {
-            INFO: {
-                class: 'alert-info',
-                message: 'Posting your comment...'
-            },
-            WARNING: {
-                class: 'alert-warning',
-                message: 'Could not post your comment. Refresh the page and try again'
-            }
-        };
-        
-        const alertDiv = document.getElementById('comment-alert');
-        const alertMessageDiv = document.getElementById('comment-alert-message');
-        const form = event.target;
-        
-        if (alertDiv) {
-            alertDiv.classList.remove(alerts.WARNING.class);
-            alertDiv.classList.add(alerts.INFO.class);
-            alertMessageDiv.innerText = alerts.INFO.message;
-            alertDiv.style.display = '';
-        }
+    // turn input controls on and off
+    const inputControl = (disable = false) => {
+        [...formRef.current.querySelectorAll('.form-control')].forEach((control) => control.disabled = disable);
+    }
 
-        createComment(event.target, () => {
-            alertDiv.style.display = 'none';
-            form.reset()
-        }, () => {
-            if (alertDiv) {
-                alertDiv.classList.remove(alerts.INFO.class);
-                alertDiv.classList.add(alerts.WARNING.class);
-                alertMessageDiv.innerText = alerts.WARNING.message;
-                alertDiv.style.display = '';
-            }
-        });
-
-
+    const successPostComment = () => {
+        [messageZone, errorZone].forEach((zone) => zone.current.style.display = 'none');
+        inputControl(false);
+        formRef.current.reset();
     };
 
+    const errorPostComment = () => {
+        messageZone.current.style.display = 'none';
+        errorZone.current.style.display = 'block';
+        inputControl(false);
+    };
+
+    // on submit form
+    /**
+     * @param {SubmitEvent} submitAction
+     * */
+    const postComment = (submitAction) => {
+        submitAction.preventDefault();
+        errorZone.current.style.display = 'none';
+        messageZone.current.style.display = 'block';
+
+        // extract the comment from the form
+        const comment = new FormData(submitAction.target);
+        inputControl(true);
+
+        // engage action
+        createComment(comment, successPostComment, errorPostComment);
+    }
+
     return (
-        <form method="post" encType="multipart/form-data" onSubmit={handleCreateComment}>
+        <form ref={formRef} method="post" encType="multipart/form-data" onSubmit={postComment}>
             <div className="form-group">
                 <label>Comment:</label>
-                <textarea name='comment' className="form-control" cols="40" rows="10" maxLength="140" required id="id_comment" placeholder="add comment here (use '@username' to mention someone)"></textarea>
+                <TextArea />
             </div>
             <hr />
 
-            <div id="comment-alert" className="alert alert-info" role="alert" style={hiddenFeature}>
-                <p id="comment-alert-message">Posting your comment...</p>
+            <div ref={messageZone} className="comment-alert alert alert-info" role="alert">
+                <p id="comment-alert-message">Posting your comment <img src={loadingGif} alt="loading GIF"/></p>
+            </div>
+
+            <div ref={errorZone} className="comment-alert alert alert-warning" role="alert">
+                <p id="comment-alert-message">Could not post your comment. Refresh the page and try again</p>
             </div>
 
             <div className="col-sm-4">
@@ -61,4 +80,4 @@ export default function CommentFormArea () {
             </div>
         </form>
     );
-};
+}

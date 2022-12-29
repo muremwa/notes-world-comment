@@ -1,0 +1,8 @@
+.comment-alert {
+    font-size: 2em;
+    display: none;
+}
+
+#id_comment {
+    height: 8em;
+}
