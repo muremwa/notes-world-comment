@@ -1,0 +1,19 @@
+.r-comment-info {
+    color: darkslategrey;
+    font-family: roboto, Verdana, sans-serif;
+    font-size: 1.5em;
+}
+
+.r-user-img img {
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+}
+
+.r-comment-text p a {
+    color: brown;
+}
+
+#r-comments textarea {
+    width: 100%;
+}
