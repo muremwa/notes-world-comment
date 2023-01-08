@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CommentForm from './sections/CommentFormArea';
+import CommentSite from "./sections/comments/Comment";
 
 import { fetchComments } from './actions/CommentActions';
 import store, { storeEvents } from './stores/CommentStore';
@@ -87,6 +88,8 @@ export default function App () {
             </h3>
 
             <CommentForm />
+            <hr/>
+            <CommentSite note={note} />
         </div>
     );
 }
