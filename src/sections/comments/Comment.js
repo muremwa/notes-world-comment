@@ -1,7 +1,8 @@
 import React from "react";
+import BottomAction from "./bottom";
 
 import './Comment.css';
-
+import commentStore from "../../stores/CommentStore";
 
 
 function UserImage({ profile, name }) {
@@ -15,32 +16,34 @@ function UserImage({ profile, name }) {
     );
 }
 
-const Edited = ({ edited }) => edited? <span className='text-info'>edited sucker</span>: null;
+const Edited = ({ edited }) => edited? <span className='text-info'>edited</span>: null;
 
-function CommentBody ({ comment, note }) {
+function CommentBody ({ comment }) {
     return (
         <div className="col-sm-11">
             <span className="r-comment-info">
                 <strong>{ comment.user.fullName }</strong>
-                <small className="text-danger">@{ comment.user.username }</small>
-                posted <strong className="dated">{ comment.time }</strong>
+                <small className="text-danger"> @{ comment.user.username } </small>
+                posted <strong className="dated"> { comment.time } </strong>
                 <Edited edited={comment.edited} />
                 <span className="text-info"> { comment.replies } {comment.replies === 1? 'reply': 'replies'}</span>
             </span>
 
             <div className="comment-text" id="comment-text">
-                <p>Comment text goes here</p>
+                <p>{ comment.text }</p>
             </div>
+
+            <BottomAction {...{comment}} />
         </div>
     )
 }
 
 
-function Comment ({ comment, note }) {
+function Comment ({ comment }) {
     return (
         <div className="row text-primary comment" id={`comment${ comment.commentId }`}>
             <UserImage name={comment.user.username} profile={comment.user.profile}/>
-            <CommentBody {...{ comment, note }}/>
+            <CommentBody {...{ comment }}/>
             <hr />
         </div>
     )
@@ -56,7 +59,11 @@ export default function CommentSite ({ note }) {
         );
     }
 
-    const commentsParsed = note.comments.map((comment, k) => <Comment {...{ comment, note, key: k}} />);
+    const commentsParsed = note.comments.map((comment) => ({
+        ...comment,
+        canEdit: commentStore.user.id === comment.user.id,
+        canDelete: (commentStore.user.id === comment.user.id) || (commentStore.user.ownsNote)
+    })).map((comment) => <Comment {...{ comment, key: comment.commentId }} />);
 
     return (
         <div>
