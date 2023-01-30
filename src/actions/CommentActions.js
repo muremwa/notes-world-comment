@@ -1,6 +1,5 @@
 import dispatcher from '../dispatcher/dispatcher';
 import { storeEvents } from '../stores/CommentStore';
-import ajax from './ajaxWrapper';
 import { noteCommentsApi } from '../index';
 
 
@@ -24,66 +23,69 @@ export function fetchComments (onError) {
 }
 
 
-export function deleteComment(commentDeleteUrl, form, commentId, onError) {
-    /* 
-     delete a comment
-     */
-    const deleteOptions = {
-        headers: [{
-            name: 'X-HTTP-Method-Override',
-            value: 'DELETE'
-        },],
-        url: commentDeleteUrl,
-        form,
-        success: (response) => {
-            if (response.response.success === true){
-                dispatcher.dispatch({
-                    type: 'DELETE_COMMENT',
-                    comment: commentId,
-                })
-            } else {
-                onError()
-            }
-        },
-        error: function (err) {
-            onError()
+/**
+ * @param {URL | string} commentDeleteUrl
+ * @param {() => void} errorCallback
+ * */
+export function deleteComment (commentDeleteUrl, errorCallback) {
+    fetch(commentDeleteUrl, {
+        method: 'DELETE',
+        credentials: 'include',
+        // TODO: REMOVE HEADER
+        headers: {
+            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
         }
-    };
-
-    ajax.post(deleteOptions);
-};
-
-
-export function editComment (form, url, onError) {
-    /* 
-     edit a comment    
-     */
-    const editCommentOptions = {
-        headers: [
-            {
-                name: 'X-HTTP-Method-Override',
-                value: 'PATCH'   
-            },
-        ],
-        url: url,
-        form,
-        success: (response) => {
-            if (response.response.success === true) {
-                dispatcher.dispatch ({
-                    type: 'COMMENT_EDIT',
-                    payload: response.response
-                });
-            } else {
-                onError()
-            }
-        },
-        error: function (err) {
-            onError()
+    }).then((payload) => {
+        if (payload.ok) {
+            return payload.json()
+        } else {
+            throw new Error()
         }
-    };
+    }).then((data) => {
+        dispatcher.dispatch({
+            type: storeEvents.COMMENT_DELETE,
+            payload: data
+        });
+    }).catch(() => errorCallback())
+}
 
-    ajax.post(editCommentOptions);
-};
+
+/**
+ * @param {string | URL} url 'comment action url'
+ * @param {string} commentText 'Comment text to be saved'
+ * @param {() => void} successCallback 'function run on success posting'
+ * @param {() => void} errorCallback 'function run if an error occurs'
+ * */
+export function editComment(url, commentText, successCallback, errorCallback) {
+    fetch(url, {
+        method: 'PATCH',
+        credentials: 'include',
+        body: JSON.stringify({ 'comment': commentText }),
+        // TODO: REMOVE HEADER
+        headers: {
+            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
+            'Content-Type': 'application/json'
+        }
+    }).then((payload) => {
+        if (payload.ok) {
+            return payload.json();
+        } else {
+            throw new Error(`${payload.status}: ${payload.statusText}`)
+        }
+    }).then((data) => {
+        const { success, comment } = data;
+
+        if (!success) {
+            throw new Error('Success: False')
+        }
+
+        successCallback();
+        dispatcher.dispatch({
+            type: storeEvents.COMMENT_EDIT,
+            payload: comment
+        });
+    }).catch(() => errorCallback());
+}
 
 
 /**

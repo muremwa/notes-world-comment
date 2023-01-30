@@ -6,6 +6,7 @@ export const storeEvents = {
     FETCH_INIT_DATA: 'fetch_init_data',
     COMMENTS_UPDATE: 'comments_update',
     COMMENT_EDIT: 'comment_edit',
+    COMMENT_DELETE: 'comment_delete',
     UPDATE: 'change'
 };
 
@@ -31,6 +32,24 @@ class CommentStore extends EventEmitter {
             case storeEvents.COMMENTS_UPDATE:
                 this.note.comments.unshift(payload);
                 this.emit(storeEvents.COMMENTS_UPDATE);
+                break;
+
+            case storeEvents.COMMENT_DELETE:
+                const commentIndex = this.note.comments.findIndex((comment) => comment.commentId === payload.commentId);
+
+                if (commentIndex > -1) {
+                    this.note.comments.splice(commentIndex, 1);
+                    this.emit(storeEvents.COMMENTS_UPDATE);
+                }
+                break;
+
+            case storeEvents.COMMENT_EDIT:
+                const editedCommentIndex = this.note.comments.findIndex((comment) => comment.commentId === payload.commentId);
+
+                if (editedCommentIndex > -1) {
+                    this.note.comments[editedCommentIndex] = payload;
+                    this.emit(storeEvents.COMMENTS_UPDATE);
+                }
                 break;
 
             default:
