@@ -16,20 +16,22 @@ function UserImage({ profile, name }) {
     );
 }
 
-const Edited = ({ edited }) => edited? <span className='text-info'>edited</span>: null;
+const Edited = ({ edited }) => edited? <> <span className='text-info'>edited</span> • </>: null;
 
 function CommentBody ({ comment }) {
     return (
         <div className="col-sm-11">
             <span className="r-comment-info">
                 <strong>{ comment.user.fullName }</strong>
-                <small className="text-danger"> @{ comment.user.username } </small>
-                posted <strong className="dated"> { comment.time } </strong>
+                <small className="text-danger"> @{ comment.user.username }</small>
+                <span> • </span>
+                <strong className="dated"> { comment.time }</strong>
+                <span> • </span>
                 <Edited edited={comment.edited} />
                 <span className="text-info"> { comment.replies } {comment.replies === 1? 'reply': 'replies'}</span>
             </span>
 
-            <div className="comment-text" id="comment-text">
+            <div className="r-comment-text" id="comment-text">
                 <p>{ comment.text }</p>
             </div>
 
