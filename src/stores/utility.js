@@ -84,7 +84,7 @@ function caseChanger (toChange, currentCase, changeTo) {
     return result;
 }
 
-function cleaner (obj = {}) {
+export default function cleaner (obj = {}) {
     /*
         clean generic data from the backend recursively!!!
     */
