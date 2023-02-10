@@ -84,7 +84,7 @@ function caseChanger (toChange, currentCase, changeTo) {
     return result;
 }
 
-export default function cleaner (obj = {}) {
+function cleaner (obj = {}) {
     /*
         clean generic data from the backend recursively!!!
     */
@@ -94,13 +94,12 @@ export default function cleaner (obj = {}) {
         return {};
     }
 
-    // create a new object holder
-    const newObj = {};
+    // create a map to hold the results
+    const objMap = new Map();
 
     // loop through all items and change case
-    for (let key of Object.keys(obj)) {
+    for (let [key, value] of Object.entries(obj)) {
         const newKey = caseChanger(key, cases.SNAKE_CASE, cases.HUNGARIAN_NOTATION);
-        let value = obj[key];
 
         // recursively clean arrays and other objects
         if (Array.isArray(value)) {
@@ -108,8 +107,7 @@ export default function cleaner (obj = {}) {
         } else if (isObject(value)) {
             value = cleaner(value);
         }
-
-        newObj[newKey] = value;
+        objMap.set(newKey, value);
     }
-    return newObj;
+    return Object.fromEntries(objMap);
 }
