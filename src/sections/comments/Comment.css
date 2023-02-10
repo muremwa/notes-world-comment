@@ -10,6 +10,39 @@
     border-radius: 50%;
 }
 
-.r-comment-text p a {
+.r-comment-text > p > a {
     color: brown;
+}
+
+.stupid-line {
+    width: 70%;
+}
+
+.r-comment-text {
+    padding-top: 7px;
+    min-height: 50px;
+    font-size: 1em;
+    width: 70%;
+    text-align: justify;
+}
+
+.r-comment-text > p {
+    font-size: 1.2em;
+}
+
+.action-row-item, .edit-form .btn {
+    text-decoration: none;
+}
+
+.action-row {
+    margin-bottom: 1em;
+}
+
+.edit-form > .alert {
+    margin-top: 0.5em;
+    font-size: 3em;
+}
+
+.edit-form {
+    margin-bottom: 1em;
 }

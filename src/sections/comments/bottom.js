@@ -10,10 +10,11 @@ const EditForm = forwardRef((props, ref) => {
     const errorBannerRef = useRef(null);
 
     const closeForm = () => {
-        if (ref.hasOwnProperty('current')) {
-            ref.current.style.display = 'none';
-            textAreaRef.current.value = commentText;
-        }
+        [infoBannerRef, errorBannerRef, ref].forEach((divRef) => {
+            if (divRef.hasOwnProperty('current')) {
+                divRef.current.style.display = 'none';
+            }
+        });
     };
 
     const submitEditForm = (event_) => {
@@ -31,22 +32,26 @@ const EditForm = forwardRef((props, ref) => {
                 infoBannerRef.current.style.display = 'none';
                 errorBannerRef.current.style.display = 'block';
             });
+        } else {
+            closeForm();
         }
     }
 
     return (
-        <form style={{ display: 'none' }} ref={ref} className='row' method="POST" onSubmit={submitEditForm}>
-            <div className="form-group col-sm-8">
-                <textarea name='comment' ref={textAreaRef} className="form-control" defaultValue={commentText}></textarea>
-            </div>
+        <>
+            <form style={{ display: 'none' }} ref={ref} className='row edit-form' method="POST" onSubmit={submitEditForm}>
+                <div className="form-group col-sm-8">
+                    <textarea required rows={4} name='comment' ref={textAreaRef} className="form-control" defaultValue={commentText}></textarea>
+                </div>
 
-            <div className="form-group col-sm-2">
-                <input type="submit" value="edit" className="btn btn-link form-control"/>
-            </div>
+                <div className="form-group col-sm-2">
+                    <input type="submit" value="edit" className="btn btn-link form-control"/>
+                </div>
 
-            <div className="form-group col-sm-2">
-                <button type='button' onClick={closeForm} className="btn btn-link form-control">close</button>
-            </div>
+                <div className="form-group col-sm-2">
+                    <button type='button' onClick={closeForm} className="btn btn-link form-control">close</button>
+                </div>
+            </form>
 
             <div className="alert alert-info" ref={infoBannerRef} style={{ display: 'none' }}>
                 Editing your comment...
@@ -55,17 +60,23 @@ const EditForm = forwardRef((props, ref) => {
             <div className="alert alert-warning" ref={errorBannerRef} style={{ display: 'none' }}>
                 An error occurred editing your comment...
             </div>
-        </form>
+        </>
     )
 })
 
 
 export default function BottomAction ({ comment }) {
-    const actK = 'col-sm-3 action-row-item';
+    const actK = 'col-sm-3 action-row-item btn btn-link';
     const editFormRef = useRef(null);
+
     const openEditForm = () => {
         editFormRef.current.style.display = 'flex'
-        editFormRef.current.querySelector('[name="comment"]').focus();
+        const textAreaElement = editFormRef.current.querySelector('[name="comment"]');
+
+        if (textAreaElement) {
+            textAreaElement.focus();
+            textAreaElement.value = comment.text;
+        }
     };
 
     // function to delete a comment
@@ -86,11 +97,11 @@ export default function BottomAction ({ comment }) {
             <hr className="stupid-line"/>
             
             <div className="row action-row">
-                <a href={comment.replyUrl} className={actK}>reply</a>
+                <a href={comment.replyUrl} className={`${actK} text-primary`}>reply</a>
 
-                { comment.canEdit? <button onClick={openEditForm} className={actK}>edit comment</button>: void 0}
+                { comment.canEdit? <button onClick={openEditForm} className={`${actK} text-dark`}>edit comment</button>: void 0}
 
-                { comment.canDelete? <button onClick={deleteComment} className={actK}>delete comment</button>: void 0}
+                { comment.canDelete? <button onClick={deleteComment} className={`${actK} text-danger`}>delete comment</button>: void 0}
             </div>
 
             {comment.canEdit? <EditForm ref={editFormRef} commentText={comment.text} url={comment.actionUrl} />: null}

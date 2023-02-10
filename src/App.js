@@ -53,10 +53,12 @@ export default function App () {
 
     // error occurred
     if (error) {
-        return <h2 className='init-sect error-sect'>
-            Could not comment section
-            <button onClick={reloadData} className="btn btn-light">Retry</button>
-        </h2>
+        return (
+            <h2 className="init-sect error-sect">
+                Could not load comment section
+                <button onClick={reloadData} className="btn btn-light">Retry</button>
+            </h2>
+        );
     }
 
     // no data loaded yet
