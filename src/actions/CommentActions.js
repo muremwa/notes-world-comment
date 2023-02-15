@@ -1,6 +1,7 @@
 import dispatcher from '../dispatcher/dispatcher';
 import { storeEvents } from '../stores/CommentStore';
 import { noteCommentsApi } from '../index';
+import commentStore from "../stores/CommentStore";
 
 
 /**
@@ -9,11 +10,7 @@ import { noteCommentsApi } from '../index';
 export function fetchComments (onError) {
     // fetch comments on load and populate notes and user details
     fetch(noteCommentsApi, {
-        credentials: 'include',
-        // TODO: REMOVE this header
-        headers: {
-            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
-        }
+        credentials: 'include'
     }).then((resp) => resp.json()).then((data) => {
         dispatcher.dispatch({
             type: storeEvents.FETCH_INIT_DATA,
@@ -28,12 +25,12 @@ export function fetchComments (onError) {
  * @param {() => void} errorCallback
  * */
 export function deleteComment (commentDeleteUrl, errorCallback) {
+    // delete a comment
     fetch(commentDeleteUrl, {
         method: 'DELETE',
         credentials: 'include',
-        // TODO: REMOVE HEADER
         headers: {
-            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
+            Authorization: `Token ${commentStore.user.token}`,
         }
     }).then((payload) => {
         if (payload.ok) {
@@ -61,9 +58,8 @@ export function editComment(url, commentText, successCallback, errorCallback) {
         method: 'PATCH',
         credentials: 'include',
         body: JSON.stringify({ 'comment': commentText }),
-        // TODO: REMOVE HEADER
         headers: {
-            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
+            Authorization: `Token ${commentStore.user.token}`,
             'Content-Type': 'application/json'
         }
     }).then((payload) => {
@@ -98,10 +94,7 @@ export function createComment (commentFormData, successCallback, errorCallback) 
         method: 'POST',
         body: commentFormData,
         credentials: 'include',
-        // TODO: REMOVE HEADER
-        headers: {
-            Authorization: 'Token 29c5cfba69582d9814d7fc3dc837327bdd2ec5cc',
-        }
+        headers: { Authorization: `Token ${commentStore.user.token}` }
     }).then((payload) => {
         if (payload.ok) {
             return payload.json();

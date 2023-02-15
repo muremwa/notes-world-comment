@@ -19,6 +19,8 @@ function UserImage({ profile, name }) {
 const Edited = ({ edited }) => edited? <> <span className='text-info'>edited</span> • </>: null;
 
 function CommentBody ({ comment }) {
+    const { replies } = comment;
+
     return (
         <div className="col-sm-11">
             <span className="r-comment-info">
@@ -28,7 +30,7 @@ function CommentBody ({ comment }) {
                 <strong className="dated"> { comment.time }</strong>
                 <span> • </span>
                 <Edited edited={comment.edited} />
-                <span className="text-info"> { comment.replies } {comment.replies === 1? 'reply': 'replies'}</span>
+                <span className="text-info"> {replies} {replies === 1? 'reply': 'replies'}</span>
             </span>
 
             <div className="r-comment-text" id="comment-text">
@@ -42,8 +44,10 @@ function CommentBody ({ comment }) {
 
 
 function Comment ({ comment }) {
+    const { commentId } = comment;
+
     return (
-        <div className="row text-primary comment" id={`comment${ comment.commentId }`}>
+        <div className="row text-primary comment" id={`comment${ commentId }`}>
             <UserImage name={comment.user.username} profile={comment.user.profile}/>
             <CommentBody {...{ comment }}/>
             <hr />
@@ -65,7 +69,10 @@ export default function CommentSite ({ note }) {
         ...comment,
         canEdit: commentStore.user.id === comment.user.id,
         canDelete: (commentStore.user.id === comment.user.id) || (commentStore.user.ownsNote)
-    })).map((comment) => <Comment {...{ comment, key: comment.commentId }} />);
+    })).map((comment) => {
+        const { commentId } = comment;
+        return <Comment {...{comment, key: commentId}} />
+    });
 
     return (
         <div>

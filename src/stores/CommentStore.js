@@ -12,8 +12,10 @@ export const storeEvents = {
 
 
 class CommentStore extends EventEmitter {
-    user = {};
-    note = {};
+    user = { token: '' };
+    note = {
+        comments: [{ commentId: null }]
+    };
 
     /**
      * @param {{ type: storeEvents, payload: any}} action

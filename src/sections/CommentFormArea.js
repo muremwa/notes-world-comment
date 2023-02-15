@@ -39,6 +39,7 @@ export default function CommentFormArea () {
     const errorPostComment = () => {
         messageZone.current.style.display = 'none';
         errorZone.current.style.display = 'block';
+        errorZone.current.scrollIntoView({ block: 'center' });
         inputControl(false);
     };
 

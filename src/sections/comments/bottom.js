@@ -31,6 +31,7 @@ const EditForm = forwardRef((props, ref) => {
             }, () => {
                 infoBannerRef.current.style.display = 'none';
                 errorBannerRef.current.style.display = 'block';
+                errorBannerRef.current.scrollIntoView({ block: 'center' })
             });
         } else {
             closeForm();
@@ -58,7 +59,7 @@ const EditForm = forwardRef((props, ref) => {
             </div>
 
             <div className="alert alert-warning" ref={errorBannerRef} style={{ display: 'none' }}>
-                An error occurred editing your comment...
+                An error occurred editing your comment!
             </div>
         </>
     )
@@ -66,6 +67,7 @@ const EditForm = forwardRef((props, ref) => {
 
 
 export default function BottomAction ({ comment }) {
+    const { replyUrl, actionUrl } = comment;
     const actK = 'col-sm-3 action-row-item btn btn-link';
     const editFormRef = useRef(null);
 
@@ -85,7 +87,7 @@ export default function BottomAction ({ comment }) {
             const delBtn = event_.target;
             delBtn.innerText = 'deleting comment';
 
-            deleteCommentAction(comment.actionUrl, () => {
+            deleteCommentAction(actionUrl, () => {
                 delBtn.innerText = 'could not delete comment';
                 delBtn.disabled = true;
             });
@@ -97,14 +99,14 @@ export default function BottomAction ({ comment }) {
             <hr className="stupid-line"/>
             
             <div className="row action-row">
-                <a href={comment.replyUrl} className={`${actK} text-primary`}>reply</a>
+                <a href={replyUrl} className={`${actK} text-primary`}>reply</a>
 
                 { comment.canEdit? <button onClick={openEditForm} className={`${actK} text-dark`}>edit comment</button>: void 0}
 
                 { comment.canDelete? <button onClick={deleteComment} className={`${actK} text-danger`}>delete comment</button>: void 0}
             </div>
 
-            {comment.canEdit? <EditForm ref={editFormRef} commentText={comment.text} url={comment.actionUrl} />: null}
+            {comment.canEdit? <EditForm ref={editFormRef} commentText={comment.text} url={actionUrl} />: null}
         </div>
     )
 }
