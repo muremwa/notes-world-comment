@@ -5,6 +5,11 @@ const cases = {
     SNAKE_CASE: 'SC',
 };
 
+const months = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 
 /**
  * @param {string} toChange
@@ -110,4 +115,19 @@ export default function cleaner (obj = {}) {
         objMap.set(newKey, value);
     }
     return Object.fromEntries(objMap);
+}
+
+/** Turn pad a num @param {number} num */
+const addAZero = (num) => num < 10? `0${num}`: num.toString();
+
+/**
+* From an epoch, get a string like "Thursday, 16 February 2023 • 17:00"
+* @param {number} stamp - the epoch
+* @return {string}
+**/
+export function processDate(stamp) {
+    const cd = new Date(stamp * 1000);
+    const dateString = `${days[cd.getDay()]}, ${cd.getDate()} ${months[cd.getMonth()]} ${cd.getFullYear()}`;
+    const timeString = `${addAZero(cd.getHours())}:${addAZero(cd.getMinutes())}`;
+    return `${dateString} • ${timeString}`;
 }

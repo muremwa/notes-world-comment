@@ -3,6 +3,7 @@ import BottomAction from "./bottom";
 
 import './Comment.css';
 import commentStore from "../../stores/CommentStore";
+import { processDate } from "../../stores/utility";
 
 
 function UserImage({ profile, name }) {
@@ -19,7 +20,7 @@ function UserImage({ profile, name }) {
 const Edited = ({ edited }) => edited? <> <span className='text-info'>edited</span> • </>: null;
 
 function CommentBody ({ comment }) {
-    const { replies } = comment;
+    const { replies: commentReplies, created: commentCreated, time: commentTime } = comment;
 
     return (
         <div className="col-sm-11">
@@ -27,10 +28,10 @@ function CommentBody ({ comment }) {
                 <strong>{ comment.user.fullName }</strong>
                 <small className="text-danger"> @{ comment.user.username }</small>
                 <span> • </span>
-                <strong className="dated"> { comment.time }</strong>
+                <strong data-toggle="tooltip" data-placement="top" title={processDate(commentCreated)} className="dated"> { commentTime }</strong>
                 <span> • </span>
                 <Edited edited={comment.edited} />
-                <span className="text-info"> {replies} {replies === 1? 'reply': 'replies'}</span>
+                <span className="text-info"> {commentReplies} {commentReplies === 1? 'reply': 'replies'}</span>
             </span>
 
             <div className="r-comment-text" id="comment-text">
