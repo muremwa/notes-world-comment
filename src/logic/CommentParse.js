@@ -1,36 +1,26 @@
-/* 
-Receive a comment and check whether it has a username in it the add link for it
-eg 'This comment has a reference to @jimmy from squarespace'
-
-parse() => 
-
-'This comment has a reference to <a href='/api/get/user/?username=jimmy'>@jimmy</a> from squarespace
-
-*/
-// TODO: REMOVE
-const userSearchUrl = '';
-
-function paintComment (comment, paint) {
-    /*
-    Given a text and a word in it, split the text the join with a link in it
-    'why would @kim do that to @bill, why?', ;@kim' => 
-    'why would <a href='/api/get/user/?username=kim'>@kim</a> do that to @bill, why?'
-    */
-    const link = `<a href='${userSearchUrl}?username=${paint.split('@')[1]}'>${paint}</a>`;
-    return comment.split(paint).join(link)
-}
-
-export default function parseComment (comment) {
-    const pattern = /@\w+/g
-
-    let users = comment.match(pattern);
+/**
+ * Receive comment_text, and a list of mentionedUsers => [ { username: string, userId: number, profileUrl: string } ]
+ * replace every user with a link to their profile.
+ *
+ * Example
+ * comment_text: 'This comment has a reference to @jimmy and @pat from squarespace'
+ * mentionedUsers: [ { username: jimmy, userId: 43, profileUrl: /to/user/43/ } ]
+ *
+ * parse() =>
+ *
+ * 'This comment has a reference to <a href='/to/user/43/'>@jimmy</a> and @pat from squarespace
+ * @param { string } comment
+ * @param { [ { username: string, userId: number, profileUrl: string } ] } mentionedUsers
+ * @return { string }
+ */
+export default function parseComment (comment, mentionedUsers) {
     let newComment = comment;
 
-    if (users !== null) {
-        for (let user of users) {
-            newComment = paintComment(newComment, user);
-        }
-    }
-
+    mentionedUsers.forEach(({ username, profileUrl}) => {
+        newComment = newComment.replace(
+            new RegExp(`@${username}`, 'g'),
+            `<a href="${profileUrl}" >@${username}</a>`
+        );
+    });
     return newComment;
 };

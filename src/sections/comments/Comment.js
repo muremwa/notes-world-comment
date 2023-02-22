@@ -3,6 +3,7 @@ import BottomAction from "./bottom";
 
 import './Comment.css';
 import commentStore from "../../stores/CommentStore";
+import parseComment from "../../logic/CommentParse";
 import { processDate } from "../../stores/utility";
 
 
@@ -20,7 +21,8 @@ function UserImage({ profile, name }) {
 const Edited = ({ edited }) => edited? <> <span className='text-info'>edited</span> • </>: null;
 
 function CommentBody ({ comment }) {
-    const { replies: commentReplies, created: commentCreated, time: commentTime } = comment;
+    const { replies: commentReplies, created: commentCreated, time: commentTime, mentioned, text } = comment;
+    const commentText = parseComment(text, mentioned);
 
     return (
         <div className="col-sm-11">
@@ -36,8 +38,8 @@ function CommentBody ({ comment }) {
                 <span className="text-info"> {commentReplies} {commentReplies === 1? 'reply': 'replies'}</span>
             </span>
 
-            <div className="r-comment-text" id="comment-text">
-                <p>{ comment.text }</p>
+            <div className="r-comment-text">
+                <p dangerouslySetInnerHTML={{ __html: commentText }}></p>
             </div>
 
             <BottomAction {...{comment}} />

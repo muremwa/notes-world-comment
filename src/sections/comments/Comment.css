@@ -12,6 +12,7 @@
 
 .r-comment-text > p > a {
     color: brown;
+    text-decoration: none;
 }
 
 .stupid-line {
