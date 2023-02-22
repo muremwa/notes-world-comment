@@ -28,7 +28,9 @@ function CommentBody ({ comment }) {
                 <strong>{ comment.user.fullName }</strong>
                 <small className="text-danger"> @{ comment.user.username }</small>
                 <span> • </span>
-                <strong data-toggle="tooltip" data-placement="top" title={processDate(commentCreated)} className="dated"> { commentTime }</strong>
+                <strong data-toggle="tooltip" data-placement="top" title={processDate(commentCreated)} className="dated">
+                    { commentTime }
+                </strong>
                 <span> • </span>
                 <Edited edited={comment.edited} />
                 <span className="text-info"> {commentReplies} {commentReplies === 1? 'reply': 'replies'}</span>

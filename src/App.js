@@ -24,13 +24,13 @@ export default function App () {
 
     // load init data
     if (initData) {
-        setInitData(false);
         fetchComments(() => setError(true));
     }
 
     // listen to events from the store
     useEffect(() => {
         const initDataUpdate = () => {
+            setInitData(false);
             setUser(store.user);
             setNote(store.note);
         };
@@ -56,7 +56,8 @@ export default function App () {
         return (
             <h2 className="init-sect error-sect">
                 Could not load comment section
-                <button onClick={reloadData} className="btn btn-light">Retry</button>
+                <br/>
+                <button onClick={reloadData} className="btn btn-outline-light">Try again</button>
             </h2>
         );
     }
