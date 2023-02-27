@@ -68,13 +68,10 @@ export default function App () {
     }
 
     const commentsMessage = () => {
-        if (note.comments.length === 1) {
-            return "1 comment";
-        } else if (note.comments.length === 0) {
-            return "no comments";
-        } else {
+        if (note.comments.length > 1) {
             return `${note.comments.length} comments`;
         }
+        return note.comments.length === 1? "1 comment": "no comments";
     };
 
     return (
