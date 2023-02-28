@@ -1,3 +1,11 @@
+.comment {
+    padding-top: 2em;
+}
+
+.comment > hr {
+    margin: 0;
+}
+
 .r-comment-info {
     color: darkslategrey;
     font-family: roboto, Verdana, sans-serif;
@@ -46,4 +54,8 @@
 
 .edit-form {
     margin-bottom: 1em;
+}
+
+.highlight-comment {
+    background-color: rgba(0, 128, 128, 0.2);
 }
