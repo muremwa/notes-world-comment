@@ -1,7 +1,7 @@
-import React from "react";
-import BottomAction from "./bottom";
+import React, { useEffect, useRef, useMemo } from "react";
 
 import './Comment.css';
+import BottomAction from "./bottom";
 import commentStore from "../../stores/CommentStore";
 import parseComment from "../../logic/CommentParse";
 import { processDate } from "../../stores/utility";
@@ -48,11 +48,30 @@ function CommentBody ({ comment }) {
 }
 
 
-function Comment ({ comment }) {
+function Comment ({ comment, focus }) {
     const { commentId } = comment;
+    const commentRef = useRef(null);
+
+    // scroll to requested comment
+    useEffect(() => {
+        let handleClickFocused;
+
+        if (focus) {
+            commentRef.current.classList.add('highlight-comment');
+            commentRef.current.scrollIntoView({ block: 'start' });
+            handleClickFocused = () => commentRef.current.classList.remove('highlight-comment');
+            commentRef.current.addEventListener('click', handleClickFocused, { once: true });
+        }
+
+        return () => {
+            if (focus && handleClickFocused) {
+                commentRef.current.removeEventListener('click', handleClickFocused)
+            }
+        }
+    }, []);
 
     return (
-        <div className="row text-primary comment" id={`comment${ commentId }`}>
+        <div ref={commentRef} className="row text-primary comment" id={`comment${ commentId }`}>
             <UserImage name={comment.user.username} profile={comment.user.profile}/>
             <CommentBody {...{ comment }}/>
             <hr />
@@ -62,6 +81,15 @@ function Comment ({ comment }) {
 
 
 export default function CommentSite ({ note }) {
+    const navCommentId = useMemo(() => {
+        const match = window.location.hash.match(/comment(?<commentId>\d+)/);
+
+        if (match && match.groups && match.groups['commentId']) {
+            return Number(match.groups['commentId']);
+        }
+        return -1;
+    }, []);
+
     if (note.comments.length === 0) {
         return (
             <div id="no-comments">
@@ -76,7 +104,7 @@ export default function CommentSite ({ note }) {
         canDelete: (commentStore.user.id === comment.user.id) || (commentStore.user.ownsNote)
     })).map((comment) => {
         const { commentId } = comment;
-        return <Comment {...{comment, key: commentId}} />
+        return <Comment {...{comment, key: commentId, focus: comment.commentId === navCommentId }} />
     });
 
     return (
