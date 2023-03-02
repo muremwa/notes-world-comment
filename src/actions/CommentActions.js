@@ -1,7 +1,6 @@
 import dispatcher from '../dispatcher/dispatcher';
-import { storeEvents } from '../stores/CommentStore';
 import { noteCommentsApi } from '../index';
-import commentStore from "../stores/CommentStore";
+import commentStore, { storeEvents } from "../stores/CommentStore";
 
 
 /**
