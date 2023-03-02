@@ -10,49 +10,36 @@ import loadingGif from "./img/l.gif";
 
 
 export default function App () {
-    const [note, setNote] = useState(null);
-    const [user, setUser] = useState(null);
-    const [initData, setInitData] = useState(true); // shall we load initial data
-    const [error, setError] = useState(false); // an error occurred loading the comment section
-
-    const reloadData = () => {
-        setNote(null);
-        setUser(null);
-        setError(false);
-        setInitData(true);
-    };
+    const initialData = { user: {}, note: {}, error: false, loadData: true }
+    const [ commentAppData, setCommentAppData ] = useState(initialData);
+    const reloadData = () => setCommentAppData(initialData);
 
     // load init data
-    if (initData) {
-        fetchComments(() => setError(true));
+    if (commentAppData.loadData) {
+        fetchComments(() => setCommentAppData({ ...commentAppData, loadData: false, error: true }));
     }
 
     // listen to events from the store
     useEffect(() => {
-        const initDataUpdate = () => {
-            setInitData(false);
-            setUser(store.user);
-            setNote(store.note);
+        const initialDataUpdate = () => {
+            setCommentAppData({user: store.user, note: store.note, error: false, loadData: false});
         };
 
         const commentsUpdate = () => {
-            setNote({
-                ...note,
-                comments: store.note.comments
-            });
+            setCommentAppData({ ...commentAppData,  note: store.note })
         };
 
-        store.on(storeEvents.FETCH_INIT_DATA, initDataUpdate);
+        store.on(storeEvents.FETCH_INIT_DATA, initialDataUpdate);
         store.on(storeEvents.COMMENTS_UPDATE, commentsUpdate);
 
         return () => {
-            store.removeListener(storeEvents.FETCH_INIT_DATA, initDataUpdate)
+            store.removeListener(storeEvents.FETCH_INIT_DATA, initialDataUpdate)
             store.removeListener(storeEvents.COMMENTS_UPDATE, commentsUpdate)
         };
     });
 
     // error occurred
-    if (error) {
+    if (commentAppData.error) {
         return (
             <h2 className="init-sect error-sect">
                 Could not load comment section
@@ -63,15 +50,15 @@ export default function App () {
     }
 
     // no data loaded yet
-    if (!note || !user) {
+    if (!commentAppData.note.note || !commentAppData.user.username) {
         return <h2 className="init-sect">Setting up comment section <img src={loadingGif} alt="loading gif"/></h2>
     }
 
     const commentsMessage = () => {
-        if (note.comments.length > 1) {
-            return `${note.comments.length} comments`;
+        if (commentAppData.note.comments.length > 1) {
+            return `${commentAppData.note.comments.length} comments`;
         }
-        return note.comments.length === 1? "1 comment": "no comments";
+        return commentAppData.note.comments.length === 1? "1 comment": "no comments";
     };
 
     return (
@@ -84,12 +71,12 @@ export default function App () {
 
             <h3>
                 comments <br/>
-                <small className="text-warning">{ note.note } by { note.user.username } has {commentsMessage()}</small>
+                <small className="text-warning">{ commentAppData.note.note } by { commentAppData.note.user.username } has {commentsMessage()}</small>
             </h3>
 
             <CommentForm />
             <hr/>
-            <CommentSite note={note} />
+            <CommentSite note={commentAppData.note} />
         </div>
     );
 }
