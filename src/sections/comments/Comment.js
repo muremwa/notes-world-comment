@@ -1,10 +1,25 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 
 import './Comment.css';
 import BottomAction from "./bottom";
 import commentStore from "../../stores/CommentStore";
 import parseComment from "../../logic/CommentParse";
 import { processDate } from "../../stores/utility";
+
+
+/**
+ * Match comment ID from a URL hash
+ * @param { string } hash
+ * @return { number }
+ * */
+function matchCommentId (hash) {
+    const match = hash.match(/comment(?<commentId>\d+)/);
+
+    if (match && match.groups && match.groups['commentId']) {
+        return Number(match.groups['commentId']);
+    }
+    return -1;
+}
 
 
 function UserImage({ profile, name }) {
@@ -48,27 +63,20 @@ function CommentBody ({ comment }) {
 }
 
 
-function Comment ({ comment, focus }) {
+function Comment ({ comment, focusComment }) {
     const { commentId } = comment;
     const commentRef = useRef(null);
 
     // scroll to requested comment
     useEffect(() => {
-        let handleClickFocused;
-
-        if (focus) {
+        if (focusComment === commentId) {
+            const removeHighlight = () => commentRef.current.classList.remove('highlight-comment');
             commentRef.current.classList.add('highlight-comment');
-            commentRef.current.scrollIntoView({ block: 'start' });
-            handleClickFocused = () => commentRef.current.classList.remove('highlight-comment');
-            commentRef.current.addEventListener('click', handleClickFocused, { once: true });
+            commentRef.current.scrollIntoView({ block: 'center' });
+            commentRef.current.addEventListener('click', removeHighlight, { once: true });
+            window.addEventListener('hashchange', removeHighlight, { once: true });
         }
-
-        return () => {
-            if (focus && handleClickFocused) {
-                commentRef.current.removeEventListener('click', handleClickFocused)
-            }
-        }
-    }, []);
+    }, [focusComment]);
 
     return (
         <div ref={commentRef} className="row text-primary comment" id={`comment${ commentId }`}>
@@ -81,14 +89,9 @@ function Comment ({ comment, focus }) {
 
 
 export default function CommentSite ({ note }) {
-    const navCommentId = useMemo(() => {
-        const match = window.location.hash.match(/comment(?<commentId>\d+)/);
-
-        if (match && match.groups && match.groups['commentId']) {
-            return Number(match.groups['commentId']);
-        }
-        return -1;
-    }, []);
+    const [ locationHash, setLocationHash ] = useState(window.location.hash);
+    const navCommentId = useMemo(() => matchCommentId(locationHash), [locationHash]);
+    window.addEventListener('hashchange', () => setLocationHash(window.location.hash));
 
     if (note.comments.length === 0) {
         return (
@@ -104,7 +107,7 @@ export default function CommentSite ({ note }) {
         canDelete: (commentStore.user.id === comment.user.id) || (commentStore.user.ownsNote)
     })).map((comment) => {
         const { commentId } = comment;
-        return <Comment {...{comment, key: commentId, focus: comment.commentId === navCommentId }} />
+        return <Comment {...{comment, key: commentId, focusComment: navCommentId }} />
     });
 
     return (
