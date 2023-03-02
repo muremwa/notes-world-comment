@@ -21,7 +21,7 @@ export function fetchComments (onError) {
 
 
 /**
- * @param {URL | string} commentDeleteUrl
+ * @param {string} commentDeleteUrl
  * @param {() => void} errorCallback
  * */
 export function deleteComment (commentDeleteUrl, errorCallback) {
@@ -48,7 +48,7 @@ export function deleteComment (commentDeleteUrl, errorCallback) {
 
 
 /**
- * @param {string | URL} url 'comment action url'
+ * @param {string} url 'comment action url'
  * @param {string} commentText 'Comment text to be saved'
  * @param {() => void} successCallback 'function run on success posting'
  * @param {() => void} errorCallback 'function run if an error occurs'
